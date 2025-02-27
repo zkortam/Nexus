@@ -4,7 +4,7 @@
 const starsCanvas = document.getElementById('stars-canvas');
 const ctx = starsCanvas.getContext('2d');
 let particles = [];
-const particleCount = 400;  // Denser star field
+const particleCount = 400;
 starsCanvas.width = window.innerWidth;
 starsCanvas.height = window.innerHeight;
 
@@ -26,7 +26,7 @@ class Particle {
     let dx = mouse.x - this.x;
     let dy = mouse.y - this.y;
     let distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance < 100) {  // More intense displacement
+    if (distance < 100) {
       this.x -= dx * 0.1;
       this.y -= dy * 0.1;
     }
@@ -115,12 +115,7 @@ function scanEnvironment() {
         if (d < scanRadius) {
           let occupied = false;
           for (let o of obstacles) {
-            if (
-              cellCenterX > o.x &&
-              cellCenterX < o.x + o.w &&
-              cellCenterY > o.y &&
-              cellCenterY < o.y + o.h
-            ) {
+            if (pointInObstacle(cellCenterX, cellCenterY, o)) {
               occupied = true;
               break;
             }
@@ -133,7 +128,7 @@ function scanEnvironment() {
       }
     }
   }
-  if (freeDots.length > 0 && mappingChart) {
+  if (freeDots.length > 0 && mappingChart && mappingChart.data) {
     mappingChart.data.datasets[1].data.push(...freeDots);
     mappingChart.update();
   }
@@ -186,9 +181,55 @@ function circleRectCollision(cx, cy, r, rect) {
   return (dx * dx + dy * dy <= (r * r));
 }
 
+function circleCircleCollision(cx1, cy1, r1, cx2, cy2, r2) {
+  let dx = cx1 - cx2;
+  let dy = cy1 - cy2;
+  let distance = Math.sqrt(dx * dx + dy * dy);
+  return distance < (r1 + r2);
+}
+
+function pointInTriangle(px, py, tri) {
+  const [x1, y1] = tri.points[0];
+  const [x2, y2] = tri.points[1];
+  const [x3, y3] = tri.points[2];
+  const area = 0.5 * (-y2 * x3 + y1 * (-x2 + x3) + x1 * (y2 - y3) + x2 * y3);
+  const s = 1 / (2 * area) * (y1 * x3 - x1 * y3 + (y3 - y1) * px + (x1 - x3) * py);
+  const t = 1 / (2 * area) * (x1 * y2 - y1 * x2 + (y1 - y2) * px + (x2 - x1) * py);
+  return s > 0 && t > 0 && (1 - s - t) > 0;
+}
+
+function pointInHexagon(px, py, hex) {
+  let inside = false;
+  for (let i = 0, j = 5; i < 6; i++) {
+    const [xi, yi] = hex.points[i];
+    const [xj, yj] = hex.points[j];
+    if ((yi > py) !== (yj > py) && px < (xj - xi) * (py - yi) / (yj - yi) + xi) {
+      inside = !inside;
+    }
+    j = i;
+  }
+  return inside;
+}
+
+function pointInTrapezoid(px, py, trap) {
+  const [x1, y1] = trap.points[0];
+  const [x2, y2] = trap.points[1];
+  const [x3, y3] = trap.points[2];
+  const [x4, y4] = trap.points[3];
+  const area = 0.5 * ((x1 * y2 - x2 * y1) + (x2 * y3 - x3 * y2) + (x3 * y4 - x4 * y3) + (x4 * y1 - x1 * y4));
+  const s = 1 / (2 * area) * ((y1 * x2 - x1 * y2) + (y2 - y1) * px + (x1 - x2) * py);
+  const t = 1 / (2 * area) * ((y2 * x3 - x2 * y3) + (y3 - y2) * px + (x2 - x3) * py);
+  return s > 0 && t > 0 && (s + t) < 1;
+}
+
 function willCollide(x, y) {
   for (let o of obstacles) {
-    if (circleRectCollision(x, y, robot.size, o)) return true;
+    if (o.shape === "rect" && circleRectCollision(x, y, robot.size, o)) return true;
+    if (o.shape === "circle" && circleCircleCollision(x, y, robot.size, o.cx, o.cy, o.r)) return true;
+    if (o.shape === "triangle" && pointInTriangle(x, y, o)) return true; // Simplified collision
+    if (o.shape === "hexagon" && pointInHexagon(x, y, o)) return true;
+    if (o.shape === "square" && circleRectCollision(x, y, robot.size, o)) return true;
+    if (o.shape === "trapezoid" && pointInTrapezoid(x, y, o)) return true;
   }
   return false;
 }
@@ -199,23 +240,68 @@ function pointRectDistance(px, py, rect) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+function pointCircleDistance(px, py, circle) {
+  let dx = px - circle.cx;
+  let dy = py - circle.cy;
+  return Math.sqrt(dx * dx + dy * dy) - circle.r;
+}
+
+function pointPolygonDistance(px, py, poly) {
+  let minDist = Infinity;
+  for (let i = 0; i < poly.points.length; i++) {
+    const [x1, y1] = poly.points[i];
+    const [x2, y2] = poly.points[(i + 1) % poly.points.length];
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)));
+    const projX = x1 + t * dx;
+    const projY = y1 + t * dy;
+    const dist = Math.sqrt((px - projX) ** 2 + (py - projY) ** 2);
+    minDist = Math.min(minDist, dist);
+  }
+  return minDist;
+}
+
+function pointInObstacle(px, py, o) {
+  if (o.shape === "rect") {
+    return px > o.x && px < o.x + o.w && py > o.y && py < o.y + o.h;
+  } else if (o.shape === "circle") {
+    return Math.sqrt((px - o.cx) ** 2 + (py - o.cy) ** 2) < o.r;
+  } else if (o.shape === "triangle") {
+    return pointInTriangle(px, py, o);
+  } else if (o.shape === "hexagon") {
+    return pointInHexagon(px, py, o);
+  } else if (o.shape === "square") {
+    return px > o.x && px < o.x + o.w && py > o.y && py < o.y + o.w;
+  } else if (o.shape === "trapezoid") {
+    return pointInTrapezoid(px, py, o);
+  }
+  return false;
+}
+
 /*****************************
  * Obstacle Avoidance Helpers *
  *****************************/
 function avoidObstacle() {
-  const detectionThreshold = 60;
+  const detectionThreshold = 40;
   let closestObs = null;
   let minDist = Infinity;
   for (let o of obstacles) {
-    let d = pointRectDistance(robot.x, robot.y, o);
+    let d = o.shape === "rect" || o.shape === "square" ? pointRectDistance(robot.x, robot.y, o) :
+            o.shape === "circle" ? pointCircleDistance(robot.x, robot.y, o) :
+            pointPolygonDistance(robot.x, robot.y, o);
     if (d < minDist) {
       minDist = d;
       closestObs = o;
     }
   }
   if (minDist < detectionThreshold && closestObs) {
-    let obsCenterX = closestObs.x + closestObs.w / 2;
-    let obsCenterY = closestObs.y + closestObs.h / 2;
+    let obsCenterX = closestObs.shape === "rect" || closestObs.shape === "square" ? closestObs.x + closestObs.w / 2 :
+                     closestObs.shape === "circle" ? closestObs.cx :
+                     closestObs.points.reduce((sum, p) => sum + p[0], 0) / closestObs.points.length;
+    let obsCenterY = closestObs.shape === "rect" || closestObs.shape === "square" ? closestObs.y + closestObs.h / 2 :
+                     closestObs.shape === "circle" ? closestObs.cy :
+                     closestObs.points.reduce((sum, p) => sum + p[1], 0) / closestObs.points.length;
     return Math.atan2(robot.y - obsCenterY, robot.x - obsCenterX);
   }
   return null;
@@ -258,33 +344,36 @@ function findSafeDirection(currentAngle) {
 let obstacles = [];
 let finished = false;
 function initObstacles(mode) {
+  obstacles = [];
   if (mode === "easy") {
     obstacles = [
-      { x: 200, y: 150, w: 50, h: 150 },
-      { x: 400, y: 100, w: 50, h: 100 },
-      { x: 600, y: 200, w: 50, h: 150 }
+      { x: 200, y: 150, w: 50, h: 150, shape: "rect" },
+      { x: 400, y: 100, cx: 425, cy: 125, r: 25, shape: "circle" },
+      { x: 600, y: 200, points: [[600, 200], [650, 200], [625, 250]], shape: "triangle" }
     ];
   } else if (mode === "medium") {
     obstacles = [
-      { x: 150, y: 100, w: 50, h: 150 },
-      { x: 300, y: 200, w: 50, h: 100 },
-      { x: 450, y: 50,  w: 50, h: 120 },
-      { x: 600, y: 180, w: 50, h: 80 },
-      { x: 750, y: 130, w: 50, h: 150 }
+      { x: 150, y: 100, w: 50, h: 150, shape: "rect" },
+      { x: 300, y: 200, cx: 325, cy: 225, r: 30, shape: "circle" },
+      { x: 450, y: 50, points: [[450, 50], [510, 50], [510, 110], [450, 110]], shape: "square" },
+      { x: 600, y: 180, points: [[600, 180], [650, 180], [640, 230], [610, 230]], shape: "trapezoid" },
+      { x: 750, y: 130, points: [[750, 130], [780, 110], [810, 130], [810, 170], [780, 190], [750, 170]], shape: "hexagon" }
     ];
   } else if (mode === "hard") {
     obstacles = [
-      { x: 100, y: 100, w: 40, h: 150 },
-      { x: 220, y: 50,  w: 50, h: 100 },
-      { x: 350, y: 180, w: 60, h: 150 },
-      { x: 480, y: 80,  w: 40, h: 120 },
-      { x: 600, y: 200, w: 50, h: 100 },
-      { x: 730, y: 100, w: 60, h: 150 },
-      { x: 860, y: 150, w: 50, h: 100 },
-      { x: 980, y: 80,  w: 40, h: 120 }
+      { x: 100, y: 100, w: 40, h: 150, shape: "rect" },
+      { x: 220, y: 50, cx: 245, cy: 75, r: 25, shape: "circle" },
+      { x: 350, y: 180, points: [[350, 180], [410, 180], [380, 240]], shape: "triangle" },
+      { x: 480, y: 80, points: [[480, 80], [520, 80], [520, 120], [480, 120]], shape: "square" },
+      { x: 600, y: 200, points: [[600, 200], [650, 200], [640, 250], [610, 250]], shape: "trapezoid" },
+      { x: 730, y: 100, points: [[730, 100], [760, 80], [790, 100], [790, 140], [760, 160], [730, 140]], shape: "hexagon" },
+      { x: 860, y: 150, w: 50, h: 100, shape: "rect" },
+      { x: 980, y: 80, cx: 1000, cy: 110, r: 20, shape: "circle" }
     ];
   }
 }
+
+initObstacles("medium");
 
 function drawFinishLine() {
   sCtx.strokeStyle = "#FFFFFF";
@@ -300,6 +389,41 @@ function drawCelebration() {
   sCtx.font = "48px Arial";
   sCtx.textAlign = "center";
   sCtx.fillText("Congratulations!", sandboxCanvas.width / 2, sandboxCanvas.height / 2);
+}
+
+let lastProximityCount = 0;
+function drawObstacles() {
+  let proximityCount = 0;
+  obstacles.forEach(o => {
+    let d = o.shape === "rect" || o.shape === "square" ? pointRectDistance(robot.x, robot.y, o) :
+            o.shape === "circle" ? pointCircleDistance(robot.x, robot.y, o) :
+            pointPolygonDistance(robot.x, robot.y, o);
+    if (d < 40) {
+      sCtx.fillStyle = "#00FF00"; // Green when close
+      proximityCount++;
+    } else {
+      sCtx.fillStyle = "#ff6347"; // Red when far
+    }
+    if (o.shape === "rect" || o.shape === "square") {
+      sCtx.fillRect(o.x, o.y, o.w, o.shape === "square" ? o.w : o.h);
+    } else if (o.shape === "circle") {
+      sCtx.beginPath();
+      sCtx.arc(o.cx, o.cy, o.r, 0, Math.PI * 2);
+      sCtx.fill();
+    } else if (o.shape === "triangle" || o.shape === "hexagon" || o.shape === "trapezoid") {
+      sCtx.beginPath();
+      sCtx.moveTo(o.points[0][0], o.points[0][1]);
+      for (let i = 1; i < o.points.length; i++) {
+        sCtx.lineTo(o.points[i][0], o.points[i][1]);
+      }
+      sCtx.closePath();
+      sCtx.fill();
+    }
+  });
+  if (proximityCount > lastProximityCount) {
+    collisionCount += proximityCount - lastProximityCount; // Increment for new proximity events
+  }
+  lastProximityCount = proximityCount;
 }
 
 /**********************************
@@ -370,14 +494,17 @@ function updateRobot() {
   let attempts = 0;
   while (attempts < 5 && willCollide(proposedX, proposedY)) {
     for (let o of obstacles) {
-      if (circleRectCollision(robot.x, robot.y, robot.size, o)) {
-        let diffX = robot.x - (o.x + o.w / 2);
-        let diffY = robot.y - (o.y + o.h / 2);
-        if (Math.abs(diffX) > Math.abs(diffY)) {
-          robot.direction = Math.PI - robot.direction;
-        } else {
-          robot.direction = -robot.direction;
-        }
+      if (willCollide(robot.x, robot.y)) {
+        let centerX = o.shape === "rect" || o.shape === "square" ? o.x + o.w / 2 :
+                      o.shape === "circle" ? o.cx :
+                      o.points.reduce((sum, p) => sum + p[0], 0) / o.points.length;
+        let centerY = o.shape === "rect" ? o.y + o.h / 2 :
+                      o.shape === "square" ? o.y + o.w / 2 :
+                      o.shape === "circle" ? o.cy :
+                      o.points.reduce((sum, p) => sum + p[1], 0) / o.points.length;
+        let diffX = robot.x - centerX;
+        let diffY = robot.y - centerY;
+        robot.direction = Math.atan2(diffY, diffX) + Math.PI;
         break;
       }
     }
@@ -411,18 +538,6 @@ function drawRobot() {
   sCtx.beginPath();
   sCtx.arc(robot.x, robot.y, robot.size, 0, Math.PI * 2);
   sCtx.fill();
-}
-
-function drawObstacles() {
-  obstacles.forEach(o => {
-    let d = pointRectDistance(robot.x, robot.y, o);
-    if (d < 60) {
-      sCtx.fillStyle = "#00FF00";
-    } else {
-      sCtx.fillStyle = "#ff6347";
-    }
-    sCtx.fillRect(o.x, o.y, o.w, o.h);
-  });
 }
 
 function animateSandbox() {
@@ -484,7 +599,7 @@ function createCharts() {
     data: {
       labels: [],
       datasets: [{
-        label: 'Obstacle Encounters',
+        label: 'Obstacle Encounters (Collisions + Proximity)',
         data: [],
         borderColor: '#ff6347',
         backgroundColor: 'rgba(255,99,71,0.2)',
@@ -558,6 +673,7 @@ function resetSimulation() {
   turnCount = 0;
   simulationTime = 0;
   scanCounter = 0;
+  lastProximityCount = 0;
   robot = { x: 50, y: sandboxCanvas.height / 2, size: 20, speed: baseSpeed, direction: Math.random() * Math.PI * 2, inCollision: false };
   let mode = diffSelect.value;
   initObstacles(mode);

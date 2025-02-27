@@ -1,0 +1,298 @@
+/* Global Styles: Continuous Background Gradient */
+body, html {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #000000, #0d4d8f, #2e64a1, #3b5998);
+    color: #fff;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  a {
+    color: #1e90ff;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  
+  a:hover {
+    color: #63b3ed;
+  }
+  
+  /* Pill-shaped Button */
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
+    background: #1e90ff;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+  }
+  
+  .btn:hover {
+    background: #63b3ed;
+    transform: scale(1.05);
+  }
+  
+  /* Landing Section */
+  #landing {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  #landing canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .landing-text {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding-top: 30vh;
+    animation: fadeIn 1.5s ease-out;
+  }
+  
+  .landing-text h1 {
+    font-size: 4rem;
+    margin: 0;
+    letter-spacing: 2px;
+  }
+  
+  .landing-text p {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+  }
+  
+  /* Fade-in Keyframe */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Robots Section */
+  #robots {
+    padding: 60px 0;
+  }
+  
+  .robot-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    transition: transform 0.5s;
+  }
+  
+  .robot-tile {
+    background: rgba(30, 30, 30, 0.8);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .robot-tile img {
+    width: 100%;
+    display: block;
+    border-radius: 15px;
+  }
+  
+  .robot-tile:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(30,144,255,0.7);
+  }
+  
+  /* Sandbox Section */
+  #sandbox {
+    padding: 60px 0;
+  }
+  
+  #speed-control {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  }
+  
+  #speed-slider {
+    width: 300px;
+    transition: transform 0.3s;
+  }
+  
+  #speed-slider:hover {
+    transform: scale(1.05);
+  }
+  
+  #sandbox-canvas {
+    background: rgba(13, 13, 13, 0.8);
+    border: 1px solid #333;
+    border-radius: 15px;
+    display: block;
+    margin: 0 auto 20px;
+  }
+  
+  .charts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 20px;
+  }
+  
+  .chart-container {
+    flex: 1 1 calc(33% - 20px);
+    background: rgba(26, 26, 26, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+    min-height: 250px;
+    transition: transform 0.3s;
+  }
+  
+  .chart-container:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* Force Chart Canvas Sizing */
+  .chart-container canvas {
+    width: 100% !important;
+    height: 250px !important;
+  }
+  
+  /* Team Section */
+  #team {
+    padding: 60px 0;
+  }
+  
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .team-member {
+    background: rgba(30, 30, 30, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .team-member:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(30,144,255,0.7);
+  }
+  
+  .team-member img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+  }
+  
+  .team-member h3 {
+    margin: 10px 0;
+  }
+  
+  .social-icons a {
+    margin: 0 5px;
+    font-size: 1.5rem;
+    transition: transform 0.3s;
+  }
+  
+  .social-icons a:hover {
+    transform: scale(1.2);
+  }
+  
+  /* Footer with Earth Illustration */
+  footer {
+    position: relative;
+    z-index: 2;
+  }
+  
+  #earth {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background: radial-gradient(circle at center, #1E90FF, #104E8B);
+    border-top-left-radius: 50% 100%;
+    border-top-right-radius: 50% 100%;
+    overflow: hidden;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+    animation: slideUp 1s ease-out;
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  
+  /* Continents */
+  .continent {
+    position: absolute;
+    background: #228B22;
+    border-radius: 50%;
+    opacity: 0.85;
+    transition: transform 0.3s;
+  }
+  
+  .continent:hover {
+    transform: scale(1.1);
+  }
+  
+  .continent1 {
+    width: 100px;
+    height: 60px;
+    bottom: 80px;
+    left: 8%;
+  }
+  
+  .continent2 {
+    width: 80px;
+    height: 50px;
+    bottom: 100px;
+    left: 40%;
+  }
+  
+  .continent3 {
+    width: 90px;
+    height: 55px;
+    bottom: 90px;
+    left: 70%;
+  }
+  
+  .continent4 {
+    width: 70px;
+    height: 50px;
+    bottom: 130px;
+    left: 25%;
+  }
+  
+  .continent5 {
+    width: 60px;
+    height: 45px;
+    bottom: 120px;
+    left: 55%;
+  }
+  
+  /* Footer text inside the Earth */
+  .footer-text {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size: 0.9rem;
+  }
+  
+
+  

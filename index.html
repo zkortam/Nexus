@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus - Autonomous Sensory Robotical Vehicle</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Landing Section -->
+  <section id="landing">
+    <canvas id="stars-canvas"></canvas>
+    <div class="landing-text">
+      <h1>Nexus</h1>
+      <p>Autonomous Sensory Robotical Vehicle</p>
+      <button class="btn">Explore</button>
+    </div>
+  </section>
+
+  <!-- Robots Section -->
+  <section id="robots" class="container">
+    <h2>Our Robots</h2>
+    <div class="robot-grid">
+      <div class="robot-tile">
+        <img src="assets/image1.png" alt="Robot 1">
+      </div>
+      <div class="robot-tile">
+        <img src="assets/image2.png" alt="Robot 2">
+      </div>
+      <div class="robot-tile">
+        <img src="assets/image3.png" alt="Robot 3">
+      </div>
+      <div class="robot-tile">
+        <img src="assets/image4.png" alt="Robot 4">
+      </div>
+      <div class="robot-tile">
+        <img src="assets/image5.png" alt="Robot 5">
+      </div>
+      <div class="robot-tile">
+        <img src="assets/image6.png" alt="Robot 6">
+      </div>
+    </div>
+  </section>
+
+  <!-- Sandbox Section -->
+  <section id="sandbox" class="container">
+    <h2>Interactive Sandbox</h2>
+    <!-- Controls for Difficulty & Restart -->
+    <div id="controls">
+      <select id="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium" selected>Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+      <button id="restart">Restart</button>
+    </div>
+    <!-- Sandbox Canvas -->
+    <canvas id="sandbox-canvas" width="1100" height="400"></canvas>
+    <!-- Speed Slider -->
+    <div id="speedControl">
+      <label for="speed-slider">Robot Speed (1x - 10x): </label>
+      <input type="range" id="speed-slider" min="1" max="10" step="1" value="1">
+    </div>
+    <!-- Charts Section -->
+    <div class="charts">
+      <div class="chart-container">
+        <canvas id="chart1"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart2"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart3"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section id="team" class="container">
+    <h2>Our Project Leaders</h2>
+    <div class="team-grid">
+      <div class="team-member">
+        <img src="https://via.placeholder.com/100" alt="Leader 1">
+        <h3>Leader 1</h3>
+        <div class="social-icons">
+          <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+      <div class="team-member">
+        <img src="https://via.placeholder.com/100" alt="Leader 2">
+        <h3>Leader 2</h3>
+        <div class="social-icons">
+          <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+      <div class="team-member">
+        <img src="https://via.placeholder.com/100" alt="Leader 3">
+        <h3>Leader 3</h3>
+        <div class="social-icons">
+          <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+      <div class="team-member">
+        <img src="https://via.placeholder.com/100" alt="Leader 4">
+        <h3>Leader 4</h3>
+        <div class="social-icons">
+          <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer with Earth Illustration -->
+  <footer>
+    <div id="earth">
+      <div class="earth-base"></div>
+      <div class="continent continent1"></div>
+      <div class="continent continent2"></div>
+      <div class="continent continent3"></div>
+      <div class="continent continent4"></div>
+      <div class="continent continent5"></div>
+      <div class="footer-text">
+        <p>© 2025 Nexus. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

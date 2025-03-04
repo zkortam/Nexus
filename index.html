@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Local Three.js -->
+  <script src="assets/three.min.js"></script> <!-- Use this if you download three.min.js -->
+  <!-- OR -->
+  <!-- <script src="assets/three.core.min.js"></script> --> <!-- Use this if sticking with three.core.min.js -->
 </head>
 <body>
   <!-- Landing Section -->
@@ -17,7 +21,10 @@
     <div class="landing-text">
       <h1>Nexus</h1>
       <p>Autonomous Sensory Robotical Vehicle</p>
-      <button class="btn">Explore</button>
+      <div class="button-group">
+        <button class="btn" id="explore-btn">Explore</button>
+        <button class="btn github-btn" id="github-btn"><i class="fab fa-github"></i> Github</button>
+      </div>
     </div>
   </section>
 
@@ -38,10 +45,10 @@
         <img src="assets/image4.png" alt="Robot 4">
       </div>
       <div class="robot-tile">
-        <img src="assets/image5.jpg" alt="Robot 5">
+        <img src="assets/image5.png" alt="Robot 5">
       </div>
       <div class="robot-tile">
-        <img src="assets/image6.jpg" alt="Robot 6">
+        <img src="assets/image6.png" alt="Robot 6">
       </div>
     </div>
   </section>
@@ -49,7 +56,6 @@
   <!-- Sandbox Section -->
   <section id="sandbox" class="container">
     <h2>Interactive Sandbox</h2>
-    <!-- Controls for Difficulty & Restart -->
     <div id="controls">
       <select id="difficulty">
         <option value="easy">Easy</option>
@@ -58,14 +64,11 @@
       </select>
       <button id="restart"></button>
     </div>
-    <!-- Sandbox Canvas -->
     <canvas id="sandbox-canvas" width="1100" height="400"></canvas>
-    <!-- Speed Slider -->
     <div id="speedControl">
       <label for="speed-slider">Robot Speed (1x - 10x): </label>
       <input type="range" id="speed-slider" min="1" max="10" step="1" value="1">
     </div>
-    <!-- Charts Section -->
     <div class="charts">
       <div class="chart-container">
         <canvas id="chart1"></canvas>
@@ -118,17 +121,13 @@
     </div>
   </section>
 
-  <!-- Footer with Earth Illustration -->
+  <!-- Footer with Three.js Scene -->
   <footer>
-    <div id="earth">
-      <div class="earth-base"></div>
-      <div class="continent continent1"></div>
-      <div class="continent continent2"></div>
-      <div class="continent continent3"></div>
-      <div class="continent continent4"></div>
-      <div class="continent continent5"></div>
-      <div class="footer-text">
-        <p>© 2025 Nexus. All Rights Reserved.</p>
+    <div id="earth-container">
+      <div id="earth">
+        <div class="footer-text">
+          <p>© 2025 Nexus. All Rights Reserved.</p>
+        </div>
       </div>
     </div>
   </footer>

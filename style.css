@@ -1,8 +1,8 @@
-/* Global Styles: Continuous Background Gradient */
+/* Global Styles: Updated Background Gradient */
 body, html {
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom, #000000, #0d4d8f, #2e64a1, #3b5998);
+  background: linear-gradient(to bottom, #000000 0%, #0d4d8f 40%, #2e64a1 70%, #3b5998 85%, #00008B 100%);
   color: #fff;
   font-family: Arial, sans-serif;
   overflow-x: hidden;
@@ -45,6 +45,23 @@ a:hover {
   box-shadow: 0 6px 15px rgba(30, 144, 255, 0.6);
 }
 
+.github-btn {
+  background: linear-gradient(45deg, #000000, #333333); /* Black gradient for GitHub */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px; /* Adjusted padding for icon + text */
+}
+
+.github-btn i {
+  margin-right: 8px; /* Space between icon and text */
+}
+
+.github-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+}
+
 /* Landing Section */
 #landing {
   position: relative;
@@ -77,6 +94,13 @@ a:hover {
 .landing-text p {
   font-size: 1.2rem;
   margin-top: 1rem;
+  margin-bottom: 2rem; /* Space before buttons */
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Exactly 10px spacing between buttons */
 }
 
 /* Fade-in Keyframe */
@@ -98,7 +122,7 @@ a:hover {
 }
 
 .robot-tile {
-  background: rgba(30, 30, 30, 0); /* Remove gray background */
+  background: rgba(30, 30, 30, 0);
   border-radius: 15px;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
@@ -107,7 +131,7 @@ a:hover {
 .robot-tile img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Fill container, cropping if needed */
+  object-fit: cover;
   display: block;
   border-radius: 15px;
 }
@@ -209,6 +233,8 @@ a:hover {
   border-radius: 15px;
   display: block;
   margin: 0 auto 20px;
+  width: 1100px;
+  height: 400px;
 }
 
 .charts {
@@ -282,74 +308,30 @@ a:hover {
   transform: scale(1.2);
 }
 
-/* Footer with Earth Illustration */
+/* Footer with Three.js Scene */
 footer {
   position: relative;
   z-index: 2;
+  padding-bottom: 0;
+}
+
+#earth-container {
+  position: relative;
+  width: 100%;
+  height: 350px;
 }
 
 #earth {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  background: radial-gradient(circle at center, #1E90FF, #104E8B);
-  border-top-left-radius: 50% 100%;
-  border-top-right-radius: 50% 100%;
-  overflow: hidden;
-  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
-  animation: slideUp 1s ease-out;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-.continent {
   position: absolute;
-  background: #228B22;
-  border-radius: 50%;
-  opacity: 0.85;
-  transition: transform 0.3s;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.continent:hover {
-  transform: scale(1.1);
-}
-
-.continent1 {
-  width: 100px;
-  height: 60px;
-  bottom: 80px;
-  left: 8%;
-}
-
-.continent2 {
-  width: 80px;
-  height: 50px;
-  bottom: 100px;
-  left: 40%;
-}
-
-.continent3 {
-  width: 90px;
-  height: 55px;
-  bottom: 90px;
-  left: 70%;
-}
-
-.continent4 {
-  width: 70px;
-  height: 50px;
-  bottom: 130px;
-  left: 25%;
-}
-
-.continent5 {
-  width: 60px;
-  height: 45px;
-  bottom: 120px;
-  left: 55%;
+#earth canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .footer-text {
@@ -359,4 +341,11 @@ footer {
   text-align: center;
   color: #fff;
   font-size: 0.9rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  z-index: 3;
+}
+
+/* Remove old ground, trees, clouds styles as they're now in Three.js */
+.ground, .ground-tree1, .ground-tree2, .ground-cloud1, .ground-cloud2, .ground-cloud3, #clouds-canvas, #birds-canvas {
+  display: none;
 }

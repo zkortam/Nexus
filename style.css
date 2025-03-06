@@ -2,7 +2,14 @@
 body, html {
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom, #000000 0%, #0d4d8f 40%, #2e64a1 70%, #3b5998 85%, #00008B 100%);
+  background: linear-gradient(to bottom, 
+    #000000 0%,
+    #000000 20%,
+    #0a1a2f 40%,
+    #0d4d8f 60%,
+    #2e64a1 80%,
+    #3b5998 90%,
+    #00008B 100%);
   color: #fff;
   font-family: Arial, sans-serif;
   overflow-x: hidden;

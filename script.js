@@ -4,7 +4,7 @@
 const starsCanvas = document.getElementById('stars-canvas');
 const ctx = starsCanvas.getContext('2d');
 let particles = [];
-const particleCount = 400;
+const particleCount = 800; // Increased from 400 to 800 for more stars
 
 if (starsCanvas) {
   starsCanvas.width = window.innerWidth;
@@ -21,32 +21,201 @@ window.addEventListener('mousemove', (e) => {
 
 class Particle {
   constructor() {
+    this.reset();
     this.x = Math.random() * starsCanvas.width;
     this.y = Math.random() * starsCanvas.height;
+  }
+
+  reset() {
     this.size = Math.random() * 2 + 1;
     this.speedX = (Math.random() - 0.5) * 0.5;
     this.speedY = (Math.random() - 0.5) * 0.5;
+    this.brightness = Math.random() * 0.5 + 0.5;
+    this.pulseSpeed = Math.random() * 0.02 + 0.01;
+    this.pulseOffset = Math.random() * Math.PI * 2;
   }
+
   update() {
-    let dx = mouse.x - this.x;
-    let dy = mouse.y - this.y;
-    let distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance < 100) {
-      this.x -= dx * 0.1;
-      this.y -= dy * 0.1;
+    // Pulsing effect
+    this.brightness = 0.5 + Math.sin(Date.now() * this.pulseSpeed + this.pulseOffset) * 0.2;
+    
+    // Mouse interaction with smooth easing
+    if (mouse.x && mouse.y) {
+      let dx = mouse.x - this.x;
+      let dy = mouse.y - this.y;
+      let distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < 100) {
+        let force = (100 - distance) / 100;
+        this.x -= dx * force * 0.05;
+        this.y -= dy * force * 0.05;
+      }
     }
+
     this.x += this.speedX;
     this.y += this.speedY;
+
+    // Wrap around screen edges with fade
     if (this.x < 0) this.x = starsCanvas.width;
     if (this.x > starsCanvas.width) this.x = 0;
     if (this.y < 0) this.y = starsCanvas.height;
     if (this.y > starsCanvas.height) this.y = 0;
   }
+
   draw() {
-    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
+  }
+}
+
+class ShootingStar {
+  constructor() {
+    this.reset();
+  }
+
+  reset() {
+    this.x = Math.random() * starsCanvas.width;
+    this.y = 0;
+    this.length = Math.random() * 80 + 100;
+    this.speed = Math.random() * 15 + 10;
+    this.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2;
+    this.opacity = 0;
+    this.fadeSpeed = 0.05;
+    this.active = false;
+    this.trail = [];
+    this.color = Math.random() < 0.3 ? '#63b3ed' : '#ffffff'; // Add blue variation
+  }
+
+  update() {
+    if (!this.active) {
+      if (Math.random() < 0.005) { // Increased chance from 0.001 to 0.005
+        this.active = true;
+        this.opacity = 1;
+      }
+      return;
+    }
+
+    this.x += Math.cos(this.angle) * this.speed;
+    this.y += Math.sin(this.angle) * this.speed;
+
+    // Update trail with sparkle effect
+    this.trail.unshift({ 
+      x: this.x, 
+      y: this.y, 
+      opacity: this.opacity,
+      sparkle: Math.random() > 0.7
+    });
+    
+    if (this.trail.length > 20) this.trail.pop();
+
+    // Fade out
+    if (this.x > starsCanvas.width || this.y > starsCanvas.height) {
+      this.opacity -= this.fadeSpeed;
+      if (this.opacity <= 0) {
+        this.reset();
+      }
+    }
+  }
+
+  draw() {
+    if (!this.active) return;
+
+    // Draw trail with sparkle effect
+    this.trail.forEach((point, index) => {
+      const gradientOpacity = (point.opacity * (1 - index / this.trail.length));
+      
+      // Draw main trail
+      ctx.strokeStyle = `rgba(255, 255, 255, ${gradientOpacity})`;
+      ctx.lineWidth = point.sparkle ? 3 : 2;
+      ctx.beginPath();
+      ctx.moveTo(point.x, point.y);
+      if (index < this.trail.length - 1) {
+        ctx.lineTo(this.trail[index + 1].x, this.trail[index + 1].y);
+      }
+      ctx.stroke();
+
+      // Add sparkle effect
+      if (point.sparkle) {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+  }
+}
+
+class BurningAsteroid {
+  constructor() {
+    this.reset();
+  }
+
+  reset() {
+    this.x = Math.random() * starsCanvas.width;
+    this.y = -50;
+    this.size = Math.random() * 3 + 2;
+    this.speed = Math.random() * 2 + 1;
+    this.particles = [];
+    this.active = false;
+  }
+
+  update(scrollPercent) {
+    // Only activate when scrolling past 20% of the page
+    if (scrollPercent > 0.2 && Math.random() < 0.002 && !this.active) {
+      this.active = true;
+    }
+
+    if (!this.active) return;
+
+    this.y += this.speed;
+    
+    // Create burning particles
+    if (Math.random() < 0.3) {
+      this.particles.push({
+        x: this.x,
+        y: this.y,
+        size: Math.random() * 2,
+        speedX: (Math.random() - 0.5) * 2,
+        speedY: -Math.random() * 2,
+        life: 1,
+        color: Math.random() < 0.7 ? '#ff4500' : '#ffd700'
+      });
+    }
+
+    // Update particles
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.speedX;
+      p.y += p.speedY;
+      p.life -= 0.02;
+      if (p.life <= 0) {
+        this.particles.splice(i, 1);
+      }
+    }
+
+    if (this.y > starsCanvas.height + 50) {
+      this.reset();
+      this.active = false;
+    }
+  }
+
+  draw() {
+    if (!this.active) return;
+
+    // Draw asteroid
+    ctx.fillStyle = '#808080';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw burning particles
+    this.particles.forEach(p => {
+      ctx.fillStyle = `rgba(${p.color === '#ff4500' ? '255,69,0' : '255,215,0'},${p.life})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
   }
 }
 
@@ -57,13 +226,44 @@ function initParticles() {
   }
 }
 
+// Add shooting stars array
+const shootingStars = Array(6).fill().map(() => new ShootingStar());
+
+// Add burning asteroids array
+const burningAsteroids = Array(5).fill().map(() => new BurningAsteroid());
+
 function animateParticles() {
   if (ctx) {
-    ctx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+    // Calculate scroll percentage
+    const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+    
+    // Create a subtle fade effect instead of clear
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
+
+    // Update and draw regular stars with density fade
     particles.forEach(p => {
+      // Adjust star opacity based on scroll position and Y coordinate
+      const relativeY = p.y / starsCanvas.height;
+      const densityFactor = Math.max(0, 1 - (scrollPercent + relativeY) * 0.5);
       p.update();
+      ctx.globalAlpha = p.brightness * densityFactor;
       p.draw();
     });
+    ctx.globalAlpha = 1; // Reset global alpha
+
+    // Update and draw shooting stars with increased frequency
+    shootingStars.forEach(star => {
+      star.update();
+      star.draw();
+    });
+
+    // Update and draw burning asteroids
+    burningAsteroids.forEach(asteroid => {
+      asteroid.update(scrollPercent);
+      asteroid.draw();
+    });
+
     requestAnimationFrame(animateParticles);
   }
 }
@@ -78,6 +278,13 @@ window.addEventListener('resize', () => {
     starsCanvas.width = window.innerWidth;
     starsCanvas.height = window.innerHeight;
     initParticles();
+  }
+});
+
+// Update canvas size on scroll to maintain full viewport coverage
+window.addEventListener('scroll', () => {
+  if (starsCanvas) {
+    starsCanvas.style.top = window.scrollY + 'px';
   }
 });
 
@@ -120,54 +327,271 @@ function initFooterScene() {
   sunLight.position.set(20, 30, 20);
   scene.add(sunLight);
 
-  // Ground with Solid Color
-  const groundGeometry = new THREE.PlaneGeometry(120, 120, 64, 64);
+  // Enhanced Ground with Hills and Texture
+  const groundGeometry = new THREE.PlaneGeometry(120, 120, 128, 128); // Increased segments
   const positionAttribute = groundGeometry.attributes.position;
+  
+  // Create more complex terrain with multiple wave patterns
   for (let i = 0; i < positionAttribute.count; i++) {
     const x = positionAttribute.getX(i);
     const y = positionAttribute.getY(i);
-    const z = (Math.sin(x * 0.1) + Math.cos(y * 0.1)) * 3;
+    let z = 0;
+    
+    // Large hills
+    z += Math.sin(x * 0.1) * Math.cos(y * 0.1) * 3;
+    
+    // Medium hills
+    z += Math.sin(x * 0.2 + 1.5) * Math.cos(y * 0.15) * 2;
+    
+    // Small bumps
+    z += Math.sin(x * 0.4 + 0.5) * Math.cos(y * 0.3) * 1;
+    
+    // Random variation
+    z += (Math.random() - 0.5) * 0.5;
+    
     positionAttribute.setZ(i, z);
   }
+  
   positionAttribute.needsUpdate = true;
   groundGeometry.computeVertexNormals();
+
+  // Create a more detailed ground material
   const groundMaterial = new THREE.MeshStandardMaterial({
-    color: 0x228B22, // Green
+    color: 0x228B22,
     roughness: 0.8,
-    metalness: 0.1
+    metalness: 0.1,
+    flatShading: true,
+    vertexColors: true
   });
+
+  // Add vertex colors for terrain variation
+  const colors = [];
+  const positions = groundGeometry.attributes.position.array;
+  
+  for (let i = 0; i < positions.length; i += 3) {
+    const height = positions[i + 2];
+    const color = new THREE.Color();
+    
+    if (height > 2) {
+      color.setHex(0x228B22); // Mountain tops (darker green)
+    } else if (height > 1) {
+      color.setHex(0x32CD32); // Hills (lighter green)
+    } else if (height > 0) {
+      color.setHex(0x90EE90); // Low areas (pale green)
+    } else {
+      color.setHex(0x228B22); // Valleys (regular green)
+    }
+    
+    colors.push(color.r, color.g, color.b);
+  }
+  
+  groundGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
   const ground = new THREE.Mesh(groundGeometry, groundMaterial);
   ground.rotation.x = -Math.PI / 2;
-  ground.position.y = 0; // Centered in view
+  ground.position.y = -2;
   scene.add(ground);
-  console.log("Ground added to scene at position:", ground.position);
 
-  // More Trees
-  function createTree(x, z, height) {
-    const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.6, height * 0.4, 12);
-    const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-    trunk.position.set(x, height * 0.2, z);
-
-    const foliageGeometry = new THREE.SphereGeometry(height * 0.4, 16, 16);
-    const foliageMaterial = new THREE.MeshStandardMaterial({ color: 0x006400, roughness: 0.9 });
-    const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
-    foliage.position.set(x, height * 0.6, z);
-    foliage.scale.set(1.5, 1.2, 1.5);
-
+  // Enhanced tree creation with multiple types and better details
+  function createTree(x, z, height, type = 'pine') {
     const tree = new THREE.Group();
-    tree.add(trunk);
-    tree.add(foliage);
-    scene.add(tree);
+    let trunkMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0x8B4513,
+      roughness: 0.9,
+      metalness: 0.1,
+      flatShading: true
+    });
+
+    switch(type) {
+      case 'pine':
+        // Detailed pine tree with multiple layers
+        const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, height * 0.7, 8);
+        const trunk = new THREE.Mesh(trunkGeo, trunkMaterial);
+        trunk.position.y = height * 0.35;
+        tree.add(trunk);
+
+        // Create multiple layers of pine foliage
+        const foliageColor = new THREE.Color(0x005500).addScalar(Math.random() * 0.1);
+        const foliageMaterial = new THREE.MeshStandardMaterial({
+          color: foliageColor,
+          roughness: 0.8,
+          metalness: 0.2,
+          flatShading: true
+        });
+
+        const layers = 5;
+        for (let i = 0; i < layers; i++) {
+          const layerSize = height * (0.8 - i * 0.15);
+          const coneGeo = new THREE.ConeGeometry(layerSize * 0.5, layerSize, 8);
+          const cone = new THREE.Mesh(coneGeo, foliageMaterial);
+          cone.position.y = height * (0.4 + i * 0.15);
+          tree.add(cone);
+        }
+        break;
+
+      case 'oak':
+        // Wide oak tree with detailed foliage
+        const oakTrunkGeo = new THREE.CylinderGeometry(0.6, 0.8, height * 0.6, 8);
+        const oakTrunk = new THREE.Mesh(oakTrunkGeo, trunkMaterial);
+        oakTrunk.position.y = height * 0.3;
+        tree.add(oakTrunk);
+
+        // Create random branches
+        for (let i = 0; i < 4; i++) {
+          const angle = (i / 4) * Math.PI * 2;
+          const branchGeo = new THREE.CylinderGeometry(0.2, 0.3, height * 0.4, 4);
+          const branch = new THREE.Mesh(branchGeo, trunkMaterial);
+          branch.position.set(
+            Math.cos(angle) * 0.8,
+            height * 0.5,
+            Math.sin(angle) * 0.8
+          );
+          branch.rotation.z = Math.PI / 4 * Math.cos(angle);
+          branch.rotation.x = Math.PI / 4 * Math.sin(angle);
+          tree.add(branch);
+        }
+
+        // Create foliage clusters
+        const oakFoliageColor = new THREE.Color(0x228B22).addScalar(Math.random() * 0.1);
+        const oakFoliageMaterial = new THREE.MeshStandardMaterial({
+          color: oakFoliageColor,
+          roughness: 0.8,
+          metalness: 0.2,
+          flatShading: true
+        });
+
+        for (let i = 0; i < 8; i++) {
+          const cluster = new THREE.Group();
+          const baseSize = height * 0.6;
+          
+          // Create multiple spheres for each cluster
+          for (let j = 0; j < 3; j++) {
+            const sphereSize = baseSize * (0.7 + Math.random() * 0.3);
+            const sphereGeo = new THREE.SphereGeometry(sphereSize * 0.4, 8, 8);
+            const sphere = new THREE.Mesh(sphereGeo, oakFoliageMaterial);
+            sphere.position.set(
+              (Math.random() - 0.5) * baseSize * 0.3,
+              (Math.random() - 0.5) * baseSize * 0.3,
+              (Math.random() - 0.5) * baseSize * 0.3
+            );
+            cluster.add(sphere);
+          }
+
+          const angle = (i / 8) * Math.PI * 2;
+          cluster.position.set(
+            Math.cos(angle) * baseSize * 0.3,
+            height * 0.8,
+            Math.sin(angle) * baseSize * 0.3
+          );
+          tree.add(cluster);
+        }
+        break;
+
+      case 'birch':
+        // Tall birch tree with white trunk and delicate leaves
+        const birchTrunkMaterial = new THREE.MeshStandardMaterial({
+          color: 0xE6E6E6,
+          roughness: 0.7,
+          metalness: 0.1,
+          flatShading: true
+        });
+
+        const birchTrunkGeo = new THREE.CylinderGeometry(0.25, 0.35, height * 0.8, 8);
+        const birchTrunk = new THREE.Mesh(birchTrunkGeo, birchTrunkMaterial);
+        birchTrunk.position.y = height * 0.4;
+        tree.add(birchTrunk);
+
+        // Create delicate leaf clusters
+        const birchFoliageColor = new THREE.Color(0x98FB98).addScalar(Math.random() * 0.1);
+        const birchFoliageMaterial = new THREE.MeshStandardMaterial({
+          color: birchFoliageColor,
+          roughness: 0.8,
+          metalness: 0.2,
+          flatShading: true,
+          transparent: true,
+          opacity: 0.9
+        });
+
+        for (let i = 0; i < 12; i++) {
+          const leafCluster = new THREE.Group();
+          const clusterSize = height * 0.3;
+          
+          for (let j = 0; j < 4; j++) {
+            const leafGeo = new THREE.SphereGeometry(clusterSize * 0.3, 6, 6);
+            const leaf = new THREE.Mesh(leafGeo, birchFoliageMaterial);
+            leaf.position.set(
+              (Math.random() - 0.5) * clusterSize * 0.5,
+              (Math.random() - 0.5) * clusterSize * 0.5,
+              (Math.random() - 0.5) * clusterSize * 0.5
+            );
+            leaf.scale.y = 0.5; // Flatten leaves slightly
+            leafCluster.add(leaf);
+          }
+
+          const angle = (i / 12) * Math.PI * 2;
+          const heightOffset = Math.random() * height * 0.3;
+          leafCluster.position.set(
+            Math.cos(angle) * clusterSize,
+            height * 0.7 + heightOffset,
+            Math.sin(angle) * clusterSize
+          );
+          tree.add(leafCluster);
+        }
+        break;
+    }
+
+    // Add random rotation and slight tilt
+    tree.rotation.y = Math.random() * Math.PI * 2;
+    tree.rotation.x = (Math.random() - 0.5) * 0.1;
+    tree.rotation.z = (Math.random() - 0.5) * 0.1;
+    tree.position.set(x, 0, z);
+
+    return tree;
   }
-  createTree(-15, 5, 10);
-  createTree(10, -10, 12);
-  createTree(-5, 15, 8);
-  createTree(-25, -5, 11);
-  createTree(20, 10, 9);
-  createTree(-10, -20, 13);
-  createTree(15, 20, 10);
-  createTree(0, 0, 12);
+
+  // Create trees with improved distribution and variety
+  function createForest() {
+    // Clear existing trees
+    scene.children = scene.children.filter(child => !(child instanceof THREE.Group));
+
+    // Create clusters of trees
+    const clusters = 6;
+    for (let c = 0; c < clusters; c++) {
+      const clusterCenter = {
+        x: (Math.random() - 0.5) * 80,
+        z: (Math.random() - 0.5) * 80
+      };
+
+      const treesInCluster = 5 + Math.floor(Math.random() * 4);
+      
+      for (let i = 0; i < treesInCluster; i++) {
+        const radius = 5 + Math.random() * 10;
+        const angle = (i / treesInCluster) * Math.PI * 2 + Math.random() * 0.5;
+        const x = clusterCenter.x + Math.cos(angle) * radius;
+        const z = clusterCenter.z + Math.sin(angle) * radius;
+        
+        // Vary tree height based on terrain height
+        const terrainHeight = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 3;
+        const height = 8 + Math.random() * 6 + terrainHeight;
+
+        // Choose tree type based on height and position
+        let treeType;
+        if (height > 12) {
+          treeType = 'pine';
+        } else if (height > 10) {
+          treeType = 'oak';
+        } else {
+          treeType = 'birch';
+        }
+
+        const tree = createTree(x, z, height, treeType);
+        scene.add(tree);
+      }
+    }
+  }
+
+  // Create the initial forest
+  createForest();
 
   // Enhanced Clouds
   const clouds = [];
@@ -926,3 +1350,34 @@ function resetSimulation() {
   let mode = diffSelect ? diffSelect.value : "medium";
   initObstacles(mode);
 }
+
+// Add scroll event listener for atmospheric effects
+window.addEventListener('scroll', () => {
+  const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+  const root = document.documentElement;
+  
+  // Update scroll position for glow effect
+  root.style.setProperty('--scroll-pos', `${scrollPercent * 100}%`);
+  
+  // Control heat blur and glow opacity based on scroll position
+  if (scrollPercent > 0.2 && scrollPercent < 0.5) {
+    // Atmospheric entry phase
+    const entryProgress = (scrollPercent - 0.2) / 0.3; // Normalize to 0-1
+    root.style.setProperty('--heat-blur', `${entryProgress * 3}px`);
+    root.style.setProperty('--glow-opacity', Math.min(entryProgress * 1.5, 1));
+    
+    // Add heat ripple effect to elements
+    document.querySelectorAll('.landing-text, .btn').forEach(el => {
+      el.classList.add('heat-ripple');
+    });
+  } else {
+    // Reset effects outside entry phase
+    root.style.setProperty('--heat-blur', '0px');
+    root.style.setProperty('--glow-opacity', '0');
+    
+    // Remove heat ripple effect
+    document.querySelectorAll('.landing-text, .btn').forEach(el => {
+      el.classList.remove('heat-ripple');
+    });
+  }
+});

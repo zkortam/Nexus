@@ -266,18 +266,18 @@ window.addEventListener('load', () => {
     initFooterScene();
   }, 100);
 
-  // Explore Button: Scroll to #robots
-  const exploreBtn = document.getElementById('explore-btn');
+  // Explore Button: Scroll to #sandbox
+  const exploreBtn = document.querySelector('.explore-btn');
   if (exploreBtn) {
     exploreBtn.addEventListener('click', () => {
-      document.getElementById('robots').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('sandbox').scrollIntoView({ behavior: 'smooth' });
     });
   } else {
     console.error("Explore button not found!");
   }
 
   // GitHub Button: Open GitHub link
-  const githubBtn = document.getElementById('github-btn');
+  const githubBtn = document.querySelector('.github-btn');
   if (githubBtn) {
     githubBtn.addEventListener('click', () => {
       window.open('https://github.com/zkortam/Nexus', '_blank');

@@ -114,6 +114,25 @@ a:hover {
   padding: 60px 0;
 }
 
+.robot-video {
+  margin-bottom: 20px; /* Space between video and grid */
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.robot-video video {
+  width: 100%; /* Full width of the container (3 tiles) */
+  height: 800px; /* Doubled from 400px to 800px */
+  object-fit: cover; /* Ensure the video fits nicely */
+  border-radius: 15px;
+  display: block;
+  transition: box-shadow 0.3s;
+}
+
+.robot-video:hover video {
+  box-shadow: 0 0 15px rgba(30, 144, 255, 0.5); /* Subtle glow on hover */
+}
+
 .robot-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

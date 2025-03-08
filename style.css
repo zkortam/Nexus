@@ -32,6 +32,12 @@ a:hover {
   color: #63b3ed;
 }
 
+/* --- Button Icon Spacing --- */
+.github-btn i,
+.cad-btn i {
+  margin-right: 5px;
+}
+
 /* Enhanced Button Styles */
 .btn {
   display: inline-block;
@@ -60,7 +66,7 @@ a:hover {
   box-shadow: 0 0 10px #ffffff;
 }
 
-/* Explore Button remains unchanged */
+/* Explore Button */
 .explore-btn {
   margin-left: 5px;
   box-shadow: 0 0 15px rgba(30, 144, 255, 0.6);
@@ -70,7 +76,7 @@ a:hover {
   box-shadow: 0 0 25px rgba(30, 144, 255, 0.9);
 }
 
-/* CAD Design Button: Always glow purple, intensified on hover */
+/* CAD Design Button */
 .cad-btn {
   background: linear-gradient(45deg, #6a5acd, #836fff);
   display: flex;
@@ -84,7 +90,7 @@ a:hover {
   box-shadow: 0 0 20px #6a5acd;
 }
 
-/* Button group: evenly spaced with 5px gap */
+/* Button group */
 .button-group {
   display: flex;
   justify-content: center;
@@ -185,9 +191,11 @@ a:hover {
   overflow: hidden;
   border-radius: 15px;
 }
+
+/* Videos: enforce 9:16 aspect ratio */
 .robot-video video {
   width: 100%;
-  height: 800px;
+  aspect-ratio: 9 / 16;
   object-fit: cover;
   border-radius: 15px;
   display: block;
@@ -197,6 +205,7 @@ a:hover {
   box-shadow: 0 0 15px rgba(30, 144, 255, 0.5);
 }
 
+/* Robot Tiles: Force square aspect ratio */
 .robot-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -208,6 +217,7 @@ a:hover {
   background: transparent;
   border-radius: 15px;
   overflow: hidden;
+  aspect-ratio: 1 / 1;
   transition: transform 0.3s, box-shadow 0.3s;
 }
 .robot-tile img {
@@ -225,16 +235,13 @@ a:hover {
 /* Revised Sandbox Section */
 #sandbox {
   position: relative;
-  max-width: 1200px;
+  max-width: 1100px; /* Same as 3 columns of robot tiles */
   margin: 40px auto;
   background: linear-gradient(135deg, rgba(26,26,26,0.7), rgba(51,51,51,0.7));
   border-radius: 15px;
-  padding: 30px;
+  padding: 40px; /* Extra internal padding */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   overflow: hidden;
-  padding: 60px 0;
-  max-width: 1100px;
-  margin: 0 auto;
 }
 #sandbox h2 {
   text-align: center;
@@ -256,13 +263,25 @@ a:hover {
   margin-bottom: 20px;
 }
 
-/* Checkered Finish Line */
+/* Sandbox Canvas: Removed border and margin */
+#sandbox-canvas {
+  background: radial-gradient(circle, rgba(13,13,13,1) 0%, rgba(30,30,30,1) 100%);
+  border: none;
+  border-radius: 15px;
+  display: block;
+  margin: 0;
+  width: 100%;
+  height: 400px;
+}
+
+/* Finish Line: Shifted to overlap any gap (right offset -1px) */
 .finish-line {
   position: absolute;
   top: 0;
-  right: 0;
+  right: -1px;
   width: 50px;
   height: 100%;
+  z-index: 2;
   background-image: 
     linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black),
     linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black);
@@ -348,16 +367,6 @@ a:hover {
 }
 #speed-slider:hover {
   transform: scale(1.05);
-}
-
-#sandbox-canvas {
-  background: radial-gradient(circle, rgba(13,13,13,1) 0%, rgba(30,30,30,1) 100%);
-  border: 1px solid #333;
-  border-radius: 15px;
-  display: block;
-  margin: 0 auto 20px;
-  width: 1100px;
-  height: 400px;
 }
 
 .charts {

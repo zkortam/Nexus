@@ -335,7 +335,7 @@ a:hover {
 
 #speedControl {
   text-align: center;
-  margin: 20px 0;
+  margin-bottom: 20px;
   font-size: 1.1rem;
 }
 
@@ -477,4 +477,64 @@ footer {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Mobile Optimization */
+/* For tablets and small screens */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 10px;
+  }
+  .info-cards {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .robot-video-grid {
+    flex-direction: column;
+  }
+  .robot-grid {
+    grid-template-columns: 1fr;
+  }
+  #sandbox {
+    padding: 20px;
+    margin: 20px auto;
+  }
+  #sandbox-canvas {
+    width: 100%;
+    height: auto;
+  }
+  .charts {
+    flex-direction: column;
+    gap: 20px;
+  }
+  #speed-slider {
+    width: 100%;
+  }
+}
+
+/* For mobile phones */
+@media (max-width: 480px) {
+  .landing-text h1 {
+    font-size: 2.5rem;
+  }
+  .landing-text p {
+    font-size: 1rem;
+  }
+  .section-title {
+    font-size: 2rem;
+  }
+  .info-card {
+    padding: 15px;
+  }
+  #difficulty {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+  #restart {
+    width: 40px;
+    height: 40px;
+  }
+  #speedControl label {
+    font-size: 1rem;
+  }
 }

@@ -1343,31 +1343,36 @@ function createCharts() {
 }
 
 window.addEventListener('load', () => {
-  createCharts();
-  
-  setInterval(() => {
-    simulationTime += 0.5;
-    let efficiencyMetric = cumulativeDistance / (collisionCount + turnCount + 1);
-    
-    if (obstacleChart) {
-      obstacleChart.data.labels.push(simulationTime.toFixed(1));
-      obstacleChart.data.datasets[0].data.push(collisionCount);
-      obstacleChart.update();
-    }
-    
-    if (learningChart) {
-      learningChart.data.labels.push(simulationTime.toFixed(1));
-      learningChart.data.datasets[0].data.push(efficiencyMetric.toFixed(1));
-      learningChart.update();
-    }
-    
-    if (mappingChart) {
-      let mappingPercent = computeMappingPercentage();
-      mappingChart.options.plugins.title.text = "Mapping Progress: " + mappingPercent.toFixed(1) + "%";
-      mappingChart.update();
-    }
-  }, 500);
+  // Get the buttons by their class names
+  const exploreBtn = document.querySelector('.explore-btn');
+  const githubBtn = document.querySelector('.github-btn');
+  const cadBtn = document.querySelector('.cad-btn');
+
+  // When "Explore" is clicked, scroll to the video section
+  if (exploreBtn) {
+    exploreBtn.addEventListener('click', () => {
+      const videoSection = document.querySelector('.robot-video');
+      if (videoSection) {
+        videoSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+
+  // When "GitHub" is clicked, navigate to your GitHub repo
+  if (githubBtn) {
+    githubBtn.addEventListener('click', () => {
+      window.location.href = "https://github.com/zkortam/Nexus";
+    });
+  }
+
+  // When "CAD" is clicked, navigate to your Onshape CAD document
+  if (cadBtn) {
+    cadBtn.addEventListener('click', () => {
+      window.location.href = "https://cad.onshape.com/documents/c5fff8378d1fea5a3b263ec9/w/bb9f2df86fea4bee1c8a8af8/e/027c2a1c29cde35068e23da3";
+    });
+  }
 });
+
 
 /***********************
  * Restart & Controls *

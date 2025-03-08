@@ -2,7 +2,7 @@
  * Particle Background (Stars) *
  ***********************/
 const starsCanvas = document.getElementById('stars-canvas');
-const ctx = starsCanvas.getContext('2d');
+const ctx = starsCanvas ? starsCanvas.getContext('2d') : null;
 let particles = [];
 const particleCount = 800; // Increased from 400 to 800 for more stars
 
@@ -39,22 +39,22 @@ class Particle {
     // Pulsing effect
     this.brightness = 0.5 + Math.sin(Date.now() * this.pulseSpeed + this.pulseOffset) * 0.2;
     
-    // Mouse interaction with smooth easing
+    // Mouse interaction with increased sensitivity
     if (mouse.x && mouse.y) {
       let dx = mouse.x - this.x;
       let dy = mouse.y - this.y;
       let distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < 100) {
-        let force = (100 - distance) / 100;
-        this.x -= dx * force * 0.05;
-        this.y -= dy * force * 0.05;
+      if (distance < 150) { // Increased threshold
+        let force = (150 - distance) / 150;
+        this.x -= dx * force * 0.1; // Increased multiplier
+        this.y -= dy * force * 0.1;
       }
     }
 
     this.x += this.speedX;
     this.y += this.speedY;
 
-    // Wrap around screen edges with fade
+    // Wrap around screen edges
     if (this.x < 0) this.x = starsCanvas.width;
     if (this.x > starsCanvas.width) this.x = 0;
     if (this.y < 0) this.y = starsCanvas.height;
@@ -84,12 +84,12 @@ class ShootingStar {
     this.fadeSpeed = 0.05;
     this.active = false;
     this.trail = [];
-    this.color = Math.random() < 0.3 ? '#63b3ed' : '#ffffff'; // Add blue variation
+    this.color = Math.random() < 0.3 ? '#63b3ed' : '#ffffff';
   }
 
   update() {
     if (!this.active) {
-      if (Math.random() < 0.005) { // Increased chance from 0.001 to 0.005
+      if (Math.random() < 0.005) {
         this.active = true;
         this.opacity = 1;
       }
@@ -109,7 +109,7 @@ class ShootingStar {
     
     if (this.trail.length > 20) this.trail.pop();
 
-    // Fade out
+    // Fade out when off screen
     if (this.x > starsCanvas.width || this.y > starsCanvas.height) {
       this.opacity -= this.fadeSpeed;
       if (this.opacity <= 0) {
@@ -120,12 +120,8 @@ class ShootingStar {
 
   draw() {
     if (!this.active) return;
-
-    // Draw trail with sparkle effect
     this.trail.forEach((point, index) => {
-      const gradientOpacity = (point.opacity * (1 - index / this.trail.length));
-      
-      // Draw main trail
+      const gradientOpacity = point.opacity * (1 - index / this.trail.length);
       ctx.strokeStyle = `rgba(255, 255, 255, ${gradientOpacity})`;
       ctx.lineWidth = point.sparkle ? 3 : 2;
       ctx.beginPath();
@@ -134,8 +130,6 @@ class ShootingStar {
         ctx.lineTo(this.trail[index + 1].x, this.trail[index + 1].y);
       }
       ctx.stroke();
-
-      // Add sparkle effect
       if (point.sparkle) {
         ctx.fillStyle = this.color;
         ctx.beginPath();
@@ -149,28 +143,20 @@ class ShootingStar {
 class BurningAsteroid {
   constructor() {
     this.reset();
+    this.active = true; // Always active from the beginning
   }
 
   reset() {
     this.x = Math.random() * starsCanvas.width;
     this.y = -50;
-    this.size = Math.random() * 3 + 2;
+    this.size = Math.random() * 5 + 10; // Start off larger
     this.speed = Math.random() * 2 + 1;
     this.particles = [];
-    this.active = false;
   }
 
-  update(scrollPercent) {
-    // Only activate when scrolling past 20% of the page
-    if (scrollPercent > 0.2 && Math.random() < 0.002 && !this.active) {
-      this.active = true;
-    }
-
-    if (!this.active) return;
-
+  update() {
     this.y += this.speed;
-    
-    // Create burning particles
+    this.size *= 0.995; // Gradually shrink
     if (Math.random() < 0.3) {
       this.particles.push({
         x: this.x,
@@ -182,34 +168,23 @@ class BurningAsteroid {
         color: Math.random() < 0.7 ? '#ff4500' : '#ffd700'
       });
     }
-
-    // Update particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
       p.x += p.speedX;
       p.y += p.speedY;
       p.life -= 0.02;
-      if (p.life <= 0) {
-        this.particles.splice(i, 1);
-      }
+      if (p.life <= 0) this.particles.splice(i, 1);
     }
-
-    if (this.y > starsCanvas.height + 50) {
+    if (this.y > starsCanvas.height + 50 || this.size < 2) {
       this.reset();
-      this.active = false;
     }
   }
 
   draw() {
-    if (!this.active) return;
-
-    // Draw asteroid
     ctx.fillStyle = '#808080';
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
-
-    // Draw burning particles
     this.particles.forEach(p => {
       ctx.fillStyle = `rgba(${p.color === '#ff4500' ? '255,69,0' : '255,215,0'},${p.life})`;
       ctx.beginPath();
@@ -226,44 +201,31 @@ function initParticles() {
   }
 }
 
-// Add shooting stars array
-const shootingStars = Array(6).fill().map(() => new ShootingStar());
-
-// Add burning asteroids array
-const burningAsteroids = Array(5).fill().map(() => new BurningAsteroid());
+// Reduce shooting stars and asteroids by 50%
+const shootingStars = Array(3).fill().map(() => new ShootingStar());
+const burningAsteroids = Array(3).fill().map(() => new BurningAsteroid());
 
 function animateParticles() {
   if (ctx) {
-    // Calculate scroll percentage
     const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-    
-    // Create a subtle fade effect instead of clear
     ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
     ctx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
-
-    // Update and draw regular stars with density fade
     particles.forEach(p => {
-      // Adjust star opacity based on scroll position and Y coordinate
       const relativeY = p.y / starsCanvas.height;
       const densityFactor = Math.max(0, 1 - (scrollPercent + relativeY) * 0.5);
       p.update();
       ctx.globalAlpha = p.brightness * densityFactor;
       p.draw();
     });
-    ctx.globalAlpha = 1; // Reset global alpha
-
-    // Update and draw shooting stars with increased frequency
+    ctx.globalAlpha = 1;
     shootingStars.forEach(star => {
       star.update();
       star.draw();
     });
-
-    // Update and draw burning asteroids
     burningAsteroids.forEach(asteroid => {
-      asteroid.update(scrollPercent);
+      asteroid.update();
       asteroid.draw();
     });
-
     requestAnimationFrame(animateParticles);
   }
 }
@@ -281,7 +243,6 @@ window.addEventListener('resize', () => {
   }
 });
 
-// Update canvas size on scroll to maintain full viewport coverage
 window.addEventListener('scroll', () => {
   if (starsCanvas) {
     starsCanvas.style.top = window.scrollY + 'px';
@@ -297,65 +258,42 @@ function initFooterScene() {
     console.error("Earth container not found! Check if #earth exists in the DOM.");
     return;
   }
-
   if (typeof THREE === 'undefined') {
     console.error("Three.js library not loaded! Check assets/three.min.js.");
     return;
   }
-
   console.log("Initializing enhanced Three.js footer scene...");
-
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 350, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(window.innerWidth, 350);
   renderer.setPixelRatio(window.devicePixelRatio);
-
   earthContainer.insertBefore(renderer.domElement, earthContainer.querySelector('.footer-text'));
   console.log("Three.js renderer appended to #earth successfully");
-
   const gl = renderer.getContext();
   if (!gl) {
     console.error("WebGL context not available!");
     return;
   }
-
-  // Enhanced Lighting
   const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
   scene.add(ambientLight);
   const sunLight = new THREE.PointLight(0xffffcc, 1.5, 100);
   sunLight.position.set(20, 30, 20);
   scene.add(sunLight);
-
-  // Enhanced Ground with Hills and Texture
-  const groundGeometry = new THREE.PlaneGeometry(120, 120, 128, 128); // Increased segments
+  const groundGeometry = new THREE.PlaneGeometry(120, 120, 128, 128);
   const positionAttribute = groundGeometry.attributes.position;
-  
-  // Create more complex terrain with multiple wave patterns
   for (let i = 0; i < positionAttribute.count; i++) {
     const x = positionAttribute.getX(i);
     const y = positionAttribute.getY(i);
     let z = 0;
-    
-    // Large hills
     z += Math.sin(x * 0.1) * Math.cos(y * 0.1) * 3;
-    
-    // Medium hills
     z += Math.sin(x * 0.2 + 1.5) * Math.cos(y * 0.15) * 2;
-    
-    // Small bumps
     z += Math.sin(x * 0.4 + 0.5) * Math.cos(y * 0.3) * 1;
-    
-    // Random variation
     z += (Math.random() - 0.5) * 0.5;
-    
     positionAttribute.setZ(i, z);
   }
-  
   positionAttribute.needsUpdate = true;
   groundGeometry.computeVertexNormals();
-
-  // Create a more detailed ground material
   const groundMaterial = new THREE.MeshStandardMaterial({
     color: 0x228B22,
     roughness: 0.8,
@@ -363,54 +301,43 @@ function initFooterScene() {
     flatShading: true,
     vertexColors: true
   });
-
-  // Add vertex colors for terrain variation
   const colors = [];
   const positions = groundGeometry.attributes.position.array;
-  
   for (let i = 0; i < positions.length; i += 3) {
     const height = positions[i + 2];
     const color = new THREE.Color();
-    
     if (height > 2) {
-      color.setHex(0x228B22); // Mountain tops (darker green)
+      color.setHex(0x228B22);
     } else if (height > 1) {
-      color.setHex(0x32CD32); // Hills (lighter green)
+      color.setHex(0x32CD32);
     } else if (height > 0) {
-      color.setHex(0x90EE90); // Low areas (pale green)
+      color.setHex(0x90EE90);
     } else {
-      color.setHex(0x228B22); // Valleys (regular green)
+      color.setHex(0x228B22);
     }
-    
     colors.push(color.r, color.g, color.b);
   }
-  
   groundGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
   const ground = new THREE.Mesh(groundGeometry, groundMaterial);
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -2;
   scene.add(ground);
-
-  // Enhanced tree creation with multiple types and better details
+  // Enhanced tree creation – set tree.name = "tree" so that we can filter only tree groups later.
   function createTree(x, z, height, type = 'pine') {
     const tree = new THREE.Group();
+    tree.name = "tree";
     let trunkMaterial = new THREE.MeshStandardMaterial({ 
       color: 0x8B4513,
       roughness: 0.9,
       metalness: 0.1,
       flatShading: true
     });
-
     switch(type) {
       case 'pine':
-        // Detailed pine tree with multiple layers
         const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, height * 0.7, 8);
         const trunk = new THREE.Mesh(trunkGeo, trunkMaterial);
         trunk.position.y = height * 0.35;
         tree.add(trunk);
-
-        // Create multiple layers of pine foliage
         const foliageColor = new THREE.Color(0x005500).addScalar(Math.random() * 0.1);
         const foliageMaterial = new THREE.MeshStandardMaterial({
           color: foliageColor,
@@ -418,7 +345,6 @@ function initFooterScene() {
           metalness: 0.2,
           flatShading: true
         });
-
         const layers = 5;
         for (let i = 0; i < layers; i++) {
           const layerSize = height * (0.8 - i * 0.15);
@@ -428,15 +354,11 @@ function initFooterScene() {
           tree.add(cone);
         }
         break;
-
       case 'oak':
-        // Wide oak tree with detailed foliage
         const oakTrunkGeo = new THREE.CylinderGeometry(0.6, 0.8, height * 0.6, 8);
         const oakTrunk = new THREE.Mesh(oakTrunkGeo, trunkMaterial);
         oakTrunk.position.y = height * 0.3;
         tree.add(oakTrunk);
-
-        // Create random branches
         for (let i = 0; i < 4; i++) {
           const angle = (i / 4) * Math.PI * 2;
           const branchGeo = new THREE.CylinderGeometry(0.2, 0.3, height * 0.4, 4);
@@ -450,8 +372,6 @@ function initFooterScene() {
           branch.rotation.x = Math.PI / 4 * Math.sin(angle);
           tree.add(branch);
         }
-
-        // Create foliage clusters
         const oakFoliageColor = new THREE.Color(0x228B22).addScalar(Math.random() * 0.1);
         const oakFoliageMaterial = new THREE.MeshStandardMaterial({
           color: oakFoliageColor,
@@ -459,12 +379,9 @@ function initFooterScene() {
           metalness: 0.2,
           flatShading: true
         });
-
         for (let i = 0; i < 8; i++) {
           const cluster = new THREE.Group();
           const baseSize = height * 0.6;
-          
-          // Create multiple spheres for each cluster
           for (let j = 0; j < 3; j++) {
             const sphereSize = baseSize * (0.7 + Math.random() * 0.3);
             const sphereGeo = new THREE.SphereGeometry(sphereSize * 0.4, 8, 8);
@@ -476,7 +393,6 @@ function initFooterScene() {
             );
             cluster.add(sphere);
           }
-
           const angle = (i / 8) * Math.PI * 2;
           cluster.position.set(
             Math.cos(angle) * baseSize * 0.3,
@@ -486,22 +402,17 @@ function initFooterScene() {
           tree.add(cluster);
         }
         break;
-
       case 'birch':
-        // Tall birch tree with white trunk and delicate leaves
         const birchTrunkMaterial = new THREE.MeshStandardMaterial({
           color: 0xE6E6E6,
           roughness: 0.7,
           metalness: 0.1,
           flatShading: true
         });
-
         const birchTrunkGeo = new THREE.CylinderGeometry(0.25, 0.35, height * 0.8, 8);
         const birchTrunk = new THREE.Mesh(birchTrunkGeo, birchTrunkMaterial);
         birchTrunk.position.y = height * 0.4;
         tree.add(birchTrunk);
-
-        // Create delicate leaf clusters
         const birchFoliageColor = new THREE.Color(0x98FB98).addScalar(Math.random() * 0.1);
         const birchFoliageMaterial = new THREE.MeshStandardMaterial({
           color: birchFoliageColor,
@@ -511,11 +422,9 @@ function initFooterScene() {
           transparent: true,
           opacity: 0.9
         });
-
         for (let i = 0; i < 12; i++) {
           const leafCluster = new THREE.Group();
           const clusterSize = height * 0.3;
-          
           for (let j = 0; j < 4; j++) {
             const leafGeo = new THREE.SphereGeometry(clusterSize * 0.3, 6, 6);
             const leaf = new THREE.Mesh(leafGeo, birchFoliageMaterial);
@@ -524,10 +433,9 @@ function initFooterScene() {
               (Math.random() - 0.5) * clusterSize * 0.5,
               (Math.random() - 0.5) * clusterSize * 0.5
             );
-            leaf.scale.y = 0.5; // Flatten leaves slightly
+            leaf.scale.y = 0.5;
             leafCluster.add(leaf);
           }
-
           const angle = (i / 12) * Math.PI * 2;
           const heightOffset = Math.random() * height * 0.3;
           leafCluster.position.set(
@@ -539,42 +447,30 @@ function initFooterScene() {
         }
         break;
     }
-
-    // Add random rotation and slight tilt
     tree.rotation.y = Math.random() * Math.PI * 2;
     tree.rotation.x = (Math.random() - 0.5) * 0.1;
     tree.rotation.z = (Math.random() - 0.5) * 0.1;
     tree.position.set(x, 0, z);
-
     return tree;
   }
 
-  // Create trees with improved distribution and variety
   function createForest() {
-    // Clear existing trees
-    scene.children = scene.children.filter(child => !(child instanceof THREE.Group));
-
-    // Create clusters of trees
+    // Remove only existing tree groups so that ground and other objects remain intact.
+    scene.children = scene.children.filter(child => !(child.type === "Group" && child.name === "tree"));
     const clusters = 6;
     for (let c = 0; c < clusters; c++) {
       const clusterCenter = {
         x: (Math.random() - 0.5) * 80,
         z: (Math.random() - 0.5) * 80
       };
-
       const treesInCluster = 5 + Math.floor(Math.random() * 4);
-      
       for (let i = 0; i < treesInCluster; i++) {
         const radius = 5 + Math.random() * 10;
         const angle = (i / treesInCluster) * Math.PI * 2 + Math.random() * 0.5;
         const x = clusterCenter.x + Math.cos(angle) * radius;
         const z = clusterCenter.z + Math.sin(angle) * radius;
-        
-        // Vary tree height based on terrain height
         const terrainHeight = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 3;
         const height = 8 + Math.random() * 6 + terrainHeight;
-
-        // Choose tree type based on height and position
         let treeType;
         if (height > 12) {
           treeType = 'pine';
@@ -583,14 +479,11 @@ function initFooterScene() {
         } else {
           treeType = 'birch';
         }
-
         const tree = createTree(x, z, height, treeType);
         scene.add(tree);
       }
     }
   }
-
-  // Create the initial forest
   createForest();
 
   // Enhanced Clouds
@@ -598,31 +491,31 @@ function initFooterScene() {
   class Cloud {
     constructor() {
       this.mesh = new THREE.Group();
-      const geometry = new THREE.SphereGeometry(2, 16, 16);
-      const material = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 });
+      const geometry = new THREE.SphereGeometry(2.5, 32, 32);
+      const material = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
       const puff1 = new THREE.Mesh(geometry, material);
       const puff2 = new THREE.Mesh(geometry, material);
-      puff2.scale.set(0.8, 0.8, 0.8);
-      puff2.position.set(-2, 0, 0);
+      puff2.scale.set(0.9, 0.9, 0.9);
+      puff2.position.set(-3, 0, 0);
       const puff3 = new THREE.Mesh(geometry, material);
-      puff3.scale.set(0.9, 0.9, 0.9);
-      puff3.position.set(2, 0, 0);
+      puff3.scale.set(1.1, 1.1, 1.1);
+      puff3.position.set(3, 0, 0);
       this.mesh.add(puff1, puff2, puff3);
-      this.mesh.position.set(-50, 12 + Math.random() * 5, (Math.random() - 0.5) * 20);
+      this.mesh.position.set((Math.random()-0.5)*100, 12+Math.random()*10, (Math.random()-0.5)*30);
       this.baseScale = 1;
       scene.add(this.mesh);
     }
     update() {
-      this.mesh.position.x += 0.1;
+      this.mesh.position.x += 0.15;
       if (this.mesh.position.x > 50) {
         this.mesh.position.x = -50;
-        this.mesh.position.z = (Math.random() - 0.5) * 20;
+        this.mesh.position.z = (Math.random()-0.5)*30;
       }
-      this.baseScale = 1 + Math.sin(Date.now() * 0.001) * 0.1;
+      this.baseScale = 1 + Math.sin(Date.now() * 0.0015) * 0.15;
       this.mesh.scale.set(this.baseScale, this.baseScale, this.baseScale);
     }
   }
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 10; i++) {
     clouds.push(new Cloud());
   }
 
@@ -636,7 +529,7 @@ function initFooterScene() {
   moonGlow.position.copy(moon.position);
   scene.add(moonGlow);
 
-  // Enhanced Satellite (Higher, Bigger, Full Width)
+  // Enhanced Satellite
   const satelliteBody = new THREE.BoxGeometry(2, 1, 4);
   const satelliteMaterial = new THREE.MeshStandardMaterial({ color: 0x808080 });
   const satellite = new THREE.Mesh(satelliteBody, satelliteMaterial);
@@ -654,12 +547,11 @@ function initFooterScene() {
   antenna.position.set(0, 2, 0);
   const satelliteGroup = new THREE.Group();
   satelliteGroup.add(satellite, panelLeft, panelRight, antenna);
-  satelliteGroup.position.set(-window.innerWidth / 2, 100, 0); // High in black area
+  satelliteGroup.position.set(-window.innerWidth / 2, 100, 0);
   scene.add(satelliteGroup);
 
-  // Camera to Ensure Ground Visibility
-  camera.position.set(0, 30, 50); // Focused on ground
-  camera.lookAt(0, 0, 0); // Center of scene
+  camera.position.set(0, 30, 50);
+  camera.lookAt(0, 0, 0);
 
   function animateFooter() {
     requestAnimationFrame(animateFooter);
@@ -677,39 +569,141 @@ function initFooterScene() {
     renderer.setSize(window.innerWidth, 350);
     camera.aspect = window.innerWidth / 350;
     camera.updateProjectionMatrix();
-    satelliteGroup.position.x = -window.innerWidth / 2; // Reset satellite
+    satelliteGroup.position.x = -window.innerWidth / 2;
   });
 
   console.log("Enhanced Three.js scene setup complete");
 }
 
-// Button Event Listeners and Scene Init
-window.addEventListener('load', () => {
-  console.log("DOM fully loaded, scheduling footer scene initialization...");
-  setTimeout(() => {
-    initFooterScene();
-  }, 100);
+/************************************
+ * Aircraft Animation with Chemtrail *
+ ************************************/
+const aircraftCanvas = document.getElementById('aircraft-canvas');
+let aCtx;
+if (aircraftCanvas) {
+  aCtx = aircraftCanvas.getContext('2d');
+  // Use window.innerWidth to ensure full width
+  aircraftCanvas.width = window.innerWidth;
+  aircraftCanvas.height = 150;
+} else {
+  console.error("Aircraft canvas not found!");
+}
 
-  // Explore Button: Scroll to #sandbox
-  const exploreBtn = document.querySelector('.explore-btn');
-  if (exploreBtn) {
-    exploreBtn.addEventListener('click', () => {
-      document.getElementById('sandbox').scrollIntoView({ behavior: 'smooth' });
-    });
-  } else {
-    console.error("Explore button not found!");
-  }
+let aircraft = {
+  x: -100,
+  y: 50,
+  speed: 2,
+  chemTrail: []
+};
 
-  // GitHub Button: Open GitHub link
-  const githubBtn = document.querySelector('.github-btn');
-  if (githubBtn) {
-    githubBtn.addEventListener('click', () => {
-      window.open('https://github.com/zkortam/Nexus', '_blank');
-    });
-  } else {
-    console.error("GitHub button not found!");
+function updateAircraft() {
+  aircraft.x += aircraft.speed;
+  if (aircraft.x > aircraftCanvas.width + 100) {
+    aircraft.x = -100;
+    aircraft.chemTrail = [];
   }
-});
+  aircraft.chemTrail.push({
+    x: aircraft.x - 40,
+    y: aircraft.y,
+    opacity: 1,
+    time: Date.now()
+  });
+  aircraft.chemTrail = aircraft.chemTrail.map(p => {
+    let age = (Date.now() - p.time) / 4000;
+    return { ...p, opacity: Math.max(1 - age, 0) };
+  }).filter(p => p.opacity > 0);
+}
+
+function drawAircraft() {
+  if (!aCtx) return;
+  aCtx.clearRect(0, 0, aircraftCanvas.width, aircraftCanvas.height);
+  aircraft.chemTrail.forEach(p => {
+    aCtx.save();
+    aCtx.globalAlpha = p.opacity;
+    aCtx.fillStyle = "#C0C0C0";
+    aCtx.beginPath();
+    aCtx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+    aCtx.fill();
+    aCtx.restore();
+  });
+  aCtx.save();
+  aCtx.fillStyle = "#ffcc00";
+  aCtx.beginPath();
+  aCtx.moveTo(aircraft.x, aircraft.y);
+  aCtx.lineTo(aircraft.x - 30, aircraft.y - 10);
+  aCtx.lineTo(aircraft.x - 30, aircraft.y + 10);
+  aCtx.closePath();
+  aCtx.fill();
+  aCtx.restore();
+}
+
+function animateAircraft() {
+  if (aCtx) {
+    updateAircraft();
+    drawAircraft();
+    requestAnimationFrame(animateAircraft);
+  }
+}
+
+if (aircraftCanvas) {
+  animateAircraft();
+}
+
+/************************************
+ * Celebratory Confetti for Sandbox *
+ ************************************/
+let confettiParticles = [];
+let confettiInitialized = false;
+
+function initConfetti() {
+  confettiParticles = [];
+  for (let i = 0; i < 100; i++) {
+    confettiParticles.push({
+      x: robot.x,
+      y: robot.y,
+      radius: Math.random() * 3 + 2,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+      speedX: (Math.random() - 0.5) * 5,
+      speedY: Math.random() * -5 - 2,
+      gravity: 0.2,
+      opacity: 1
+    });
+  }
+  confettiInitialized = true;
+}
+
+function updateConfetti() {
+  for (let p of confettiParticles) {
+    p.speedY += p.gravity;
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.opacity -= 0.01;
+  }
+  confettiParticles = confettiParticles.filter(p => p.opacity > 0);
+}
+
+function drawConfetti() {
+  confettiParticles.forEach(p => {
+    sCtx.save();
+    sCtx.globalAlpha = p.opacity;
+    sCtx.fillStyle = p.color;
+    sCtx.beginPath();
+    sCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    sCtx.fill();
+    sCtx.restore();
+  });
+}
+
+function drawCelebration() {
+  sCtx.save();
+  sCtx.font = "bold 48px Arial";
+  sCtx.textAlign = "center";
+  sCtx.fillStyle = "rgba(255, 255, 0, 0.9)";
+  sCtx.shadowColor = "rgba(0, 0, 0, 0.7)";
+  sCtx.shadowBlur = 10;
+  sCtx.fillText("Congratulations!", sandboxCanvas.width / 2, sandboxCanvas.height / 2);
+  sCtx.restore();
+}
 
 /************************************
  * Occupancy Grid and Chart Setup *
@@ -718,6 +712,7 @@ const sandboxCanvas = document.getElementById('sandbox-canvas');
 let sCtx;
 if (sandboxCanvas) {
   sCtx = sandboxCanvas.getContext('2d');
+  // Width set to align with charts below
   sandboxCanvas.width = 1100;
   sandboxCanvas.height = 400;
 } else {
@@ -726,7 +721,6 @@ if (sandboxCanvas) {
 
 const speedSlider = document.getElementById('speed-slider');
 const baseSpeed = 3;
-
 const cellSize = 20;
 const gridCols = Math.floor(sandboxCanvas ? sandboxCanvas.width / cellSize : 0);
 const gridRows = Math.floor(sandboxCanvas ? sandboxCanvas.height / cellSize : 0);
@@ -736,7 +730,7 @@ function initOccupancyGrid() {
   for (let i = 0; i < gridRows; i++) {
     let row = [];
     for (let j = 0; j < gridCols; j++) {
-      row.push(0); // 0 = unknown
+      row.push(0);
     }
     occupancyGrid.push(row);
   }
@@ -1031,11 +1025,20 @@ function drawFinishLine() {
   sCtx.stroke();
 }
 
-function drawCelebration() {
-  sCtx.fillStyle = "rgba(255,255,0,0.8)";
-  sCtx.font = "48px Arial";
-  sCtx.textAlign = "center";
-  sCtx.fillText("Congratulations!", sandboxCanvas.width / 2, sandboxCanvas.height / 2);
+/**********************************
+ * Enhanced Sandbox Visuals *
+ **********************************/
+function drawRobot() {
+  if (sCtx) {
+    sCtx.save();
+    sCtx.shadowColor = "rgba(30,144,255,0.7)";
+    sCtx.shadowBlur = 20;
+    sCtx.fillStyle = "#1e90ff";
+    sCtx.beginPath();
+    sCtx.arc(robot.x, robot.y, robot.size, 0, Math.PI * 2);
+    sCtx.fill();
+    sCtx.restore();
+  }
 }
 
 let lastProximityCount = 0;
@@ -1051,6 +1054,9 @@ function drawObstacles() {
     } else {
       sCtx.fillStyle = "#ff6347";
     }
+    sCtx.save();
+    sCtx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    sCtx.shadowBlur = 10;
     if (o.shape === "rect" || o.shape === "square") {
       sCtx.fillRect(o.x, o.y, o.w, o.shape === "square" ? o.w : o.h);
     } else if (o.shape === "circle") {
@@ -1066,6 +1072,7 @@ function drawObstacles() {
       sCtx.closePath();
       sCtx.fill();
     }
+    sCtx.restore();
   });
   if (proximityCount > lastProximityCount) {
     collisionCount += proximityCount - lastProximityCount;
@@ -1074,14 +1081,39 @@ function drawObstacles() {
 }
 
 /**********************************
+ * Robot Intellect Overlays *
+ **********************************/
+function drawRobotIntellect() {
+  if (!sCtx) return;
+  let avoidanceDir = avoidObstacle();
+  if (avoidanceDir !== null) {
+    let safeDir = findSafeDirection(avoidanceDir);
+    sCtx.save();
+    sCtx.strokeStyle = "#ffffff";
+    sCtx.setLineDash([5, 5]);
+    sCtx.lineWidth = 2;
+    sCtx.beginPath();
+    sCtx.moveTo(robot.x, robot.y);
+    sCtx.lineTo(robot.x + Math.cos(safeDir) * 50, robot.y + Math.sin(safeDir) * 50);
+    sCtx.stroke();
+    sCtx.restore();
+  }
+  sCtx.save();
+  sCtx.strokeStyle = "rgba(255,255,255,0.3)";
+  sCtx.lineWidth = 1;
+  sCtx.beginPath();
+  sCtx.arc(robot.x, robot.y, 60, 0, Math.PI * 2);
+  sCtx.stroke();
+  sCtx.restore();
+}
+
+/**********************************
  * Robot Navigation and Update *
  **********************************/
 const diffSelect = document.getElementById("difficulty");
 const restartBtn = document.getElementById("restart");
-
 let explorationPhase = true;
 let robot = { x: 50, y: sandboxCanvas ? sandboxCanvas.height / 2 : 200, size: 20, speed: baseSpeed, direction: Math.random() * Math.PI * 2, inCollision: false };
-
 let cumulativeDistance = 0;
 let collisionCount = 0;
 let turnCount = 0;
@@ -1180,24 +1212,22 @@ function updateRobot() {
   }
 }
 
-function drawRobot() {
-  if (sCtx) {
-    sCtx.fillStyle = "#1e90ff";
-    sCtx.beginPath();
-    sCtx.arc(robot.x, robot.y, robot.size, 0, Math.PI * 2);
-    sCtx.fill();
-  }
-}
-
 function animateSandbox() {
   if (sCtx) {
     sCtx.clearRect(0, 0, sandboxCanvas.width, sandboxCanvas.height);
     updateRobot();
     drawRobot();
     drawObstacles();
+    drawRobotIntellect();
     drawFinishLine();
+    
     if (finished) {
+      if (!confettiInitialized) {
+        initConfetti();
+      }
       drawCelebration();
+      updateConfetti();
+      drawConfetti();
     }
     requestAnimationFrame(animateSandbox);
   } else {
@@ -1339,6 +1369,26 @@ if (restartBtn) {
   });
 }
 
+// Reset simulation and charts on mode switch
+diffSelect.addEventListener('change', () => {
+  resetSimulation();
+  if (mappingChart) {
+    mappingChart.data.datasets.forEach(dataset => dataset.data = []);
+    mappingChart.data.labels = [];
+    mappingChart.update();
+  }
+  if (obstacleChart) {
+    obstacleChart.data.datasets.forEach(dataset => dataset.data = []);
+    obstacleChart.data.labels = [];
+    obstacleChart.update();
+  }
+  if (learningChart) {
+    learningChart.data.datasets.forEach(dataset => dataset.data = []);
+    learningChart.data.labels = [];
+    learningChart.update();
+  }
+});
+
 function resetSimulation() {
   cumulativeDistance = 0;
   collisionCount = 0;
@@ -1349,35 +1399,31 @@ function resetSimulation() {
   robot = { x: 50, y: sandboxCanvas ? sandboxCanvas.height / 2 : 200, size: 20, speed: baseSpeed, direction: Math.random() * Math.PI * 2, inCollision: false };
   let mode = diffSelect ? diffSelect.value : "medium";
   initObstacles(mode);
+  // Also reset occupancy grid
+  initOccupancyGrid();
 }
-
-// Add scroll event listener for atmospheric effects
+  
+// Scroll event for atmospheric effects in sandbox
 window.addEventListener('scroll', () => {
   const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
   const root = document.documentElement;
-  
-  // Update scroll position for glow effect
   root.style.setProperty('--scroll-pos', `${scrollPercent * 100}%`);
-  
-  // Control heat blur and glow opacity based on scroll position
   if (scrollPercent > 0.2 && scrollPercent < 0.5) {
-    // Atmospheric entry phase
-    const entryProgress = (scrollPercent - 0.2) / 0.3; // Normalize to 0-1
+    const entryProgress = (scrollPercent - 0.2) / 0.3;
     root.style.setProperty('--heat-blur', `${entryProgress * 3}px`);
     root.style.setProperty('--glow-opacity', Math.min(entryProgress * 1.5, 1));
-    
-    // Add heat ripple effect to elements
     document.querySelectorAll('.landing-text, .btn').forEach(el => {
       el.classList.add('heat-ripple');
     });
   } else {
-    // Reset effects outside entry phase
     root.style.setProperty('--heat-blur', '0px');
     root.style.setProperty('--glow-opacity', '0');
-    
-    // Remove heat ripple effect
     document.querySelectorAll('.landing-text, .btn').forEach(el => {
       el.classList.remove('heat-ripple');
     });
   }
+});
+
+window.addEventListener('load', () => {
+  initFooterScene();
 });

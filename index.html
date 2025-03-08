@@ -20,15 +20,58 @@
       <h1>Nexus</h1>
       <p>Autonomous Sensory Robotical Vehicle</p>
       <div class="button-group">
-        <button class="btn explore-btn">Explore</button>
+        <!-- Order: GitHub (left), Explore (center), CAD Design (right) -->
         <button class="btn github-btn"><i class="fab fa-github"></i> GitHub</button>
+        <button class="btn explore-btn">Explore</button>
+        <button class="btn cad-btn"><i class="fa-solid fa-cube"></i> CAD Design</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Info Cards Above Robots Section -->
+  <section id="info-cards" class="container">
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="info-text">
+          <h3>Object Detection</h3>
+          <p>Detects obstacles and landmarks with precision.</p>
+        </div>
+        <div class="info-icon">
+          <i class="fa-solid fa-eye"></i>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-text">
+          <h3>Path Planning</h3>
+          <p>Calculates optimal paths in real time.</p>
+        </div>
+        <div class="info-icon">
+          <i class="fa-solid fa-route"></i>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-text">
+          <h3>Memory Recall</h3>
+          <p>Remembers previously mapped environments.</p>
+        </div>
+        <div class="info-icon">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-text">
+          <h3>Intelligent Foresight</h3>
+          <p>Predicts future obstacles for safer navigation.</p>
+        </div>
+        <div class="info-icon">
+          <i class="fa-solid fa-lightbulb"></i>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Robots Section -->
   <section id="robots" class="container">
-    <h2>Our Robots</h2>
     <div class="robot-video">
       <video controls>
         <source src="assets/video1.mp4" type="video/mp4">
@@ -60,6 +103,7 @@
   <!-- Sandbox Section -->
   <section id="sandbox" class="container">
     <h2>Interactive Sandbox</h2>
+    <p class="sandbox-description">Watch as our autonomous robot navigates its environment—detecting objects, mapping terrain, and planning its optimal path in real time.</p>
     <div id="controls">
       <select id="difficulty">
         <option value="easy">Easy</option>
@@ -83,6 +127,13 @@
       <div class="chart-container">
         <canvas id="chart3"></canvas>
       </div>
+    </div>
+  </section>
+
+  <!-- Aircraft Section: Moved below the Sandbox -->
+  <section id="aircraft-section" class="container">
+    <div id="aircraft-container">
+      <canvas id="aircraft-canvas"></canvas>
     </div>
   </section>
 

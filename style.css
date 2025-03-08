@@ -47,26 +47,41 @@ a:hover {
   box-shadow: 0 4px 10px rgba(30, 144, 255, 0.4);
 }
 
-.btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(30, 144, 255, 0.6);
-}
-
+/* GitHub Button: Inverted glow - black by default, white on hover */
 .github-btn {
-  background: linear-gradient(45deg, #000000, #333333); /* Black gradient for GitHub */
+  background: linear-gradient(45deg, #000000, #333333);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px; /* Adjusted padding for icon + text */
+  padding: 12px 20px;
+  box-shadow: 0 0 10px #000000;
 }
-
-.github-btn i {
-  margin-right: 8px; /* Space between icon and text */
-}
-
 .github-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 10px #ffffff;
+}
+
+/* Explore Button remains unchanged */
+.explore-btn {}
+
+/* CAD Design Button: Always glow purple, intensified on hover */
+.cad-btn {
+  background: linear-gradient(45deg, #6a5acd, #836fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  box-shadow: 0 0 10px #6a5acd;
+  margin-left: 5px;
+}
+.cad-btn:hover {
+  box-shadow: 0 0 20px #6a5acd;
+}
+
+/* Button group: evenly spaced with 5px gap */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
 }
 
 /* Landing Section */
@@ -101,19 +116,48 @@ a:hover {
 .landing-text p {
   font-size: 1.2rem;
   margin-top: 1rem;
-  margin-bottom: 2rem; /* Space before buttons */
+  margin-bottom: 2rem;
 }
 
-.button-group {
+/* Info Cards Above Robots Section */
+.info-cards {
   display: flex;
-  justify-content: center;
-  gap: 10px; /* Exactly 10px spacing between buttons */
+  justify-content: space-between;
+  gap: 20px;
+  margin: 40px 0;
+}
+.info-card {
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 15px;
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.info-text {
+  text-align: left;
+}
+.info-text h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.info-text p {
+  margin: 5px 0 0 0;
+  font-size: 1rem;
+}
+.info-icon {
+  font-size: 2rem;
 }
 
-/* Fade-in Keyframe */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Aircraft Container */
+#aircraft-container {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  background: transparent;
+  margin: 20px 0;
 }
 
 /* Robots Section */
@@ -122,22 +166,22 @@ a:hover {
 }
 
 .robot-video {
-  margin-bottom: 20px; /* Space between video and grid */
+  margin-bottom: 20px;
   overflow: hidden;
   border-radius: 15px;
 }
 
 .robot-video video {
-  width: 100%; /* Full width of the container (3 tiles) */
-  height: 800px; /* Doubled from 400px to 800px */
-  object-fit: cover; /* Ensure the video fits nicely */
+  width: 100%;
+  height: 800px;
+  object-fit: cover;
   border-radius: 15px;
   display: block;
   transition: box-shadow 0.3s;
 }
 
 .robot-video:hover video {
-  box-shadow: 0 0 15px rgba(30, 144, 255, 0.5); /* Subtle glow on hover */
+  box-shadow: 0 0 15px rgba(30, 144, 255, 0.5);
 }
 
 .robot-grid {
@@ -170,6 +214,14 @@ a:hover {
 /* Sandbox Section */
 #sandbox {
   padding: 60px 0;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sandbox-description {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
 }
 
 #controls {
@@ -254,7 +306,7 @@ a:hover {
 }
 
 #sandbox-canvas {
-  background: rgba(13, 13, 13, 0.8);
+  background: radial-gradient(circle, rgba(13,13,13,1) 0%, rgba(30,30,30,1) 100%);
   border: 1px solid #333;
   border-radius: 15px;
   display: block;
@@ -269,6 +321,9 @@ a:hover {
   justify-content: space-between;
   margin-top: 30px;
   gap: 20px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .chart-container {
@@ -371,7 +426,7 @@ footer {
   z-index: 3;
 }
 
-/* Remove old ground, trees, clouds styles as they're now in Three.js */
+/* Remove old ground, trees, clouds styles */
 .ground, .ground-tree1, .ground-tree2, .ground-cloud1, .ground-cloud2, .ground-cloud3, #clouds-canvas, #birds-canvas {
   display: none;
 }

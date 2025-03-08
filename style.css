@@ -62,15 +62,13 @@ a:hover {
 
 /* Explore Button remains unchanged */
 .explore-btn {
-  box-shadow: 0 0 15px rgba(30, 144, 255, 0.6); /* default glow */
-  transition: box-shadow 0.3s ease;
   margin-left: 5px;
+  box-shadow: 0 0 15px rgba(30, 144, 255, 0.6);
+  transition: box-shadow 0.3s ease;
 }
-
 .explore-btn:hover {
-  box-shadow: 0 0 25px rgba(30, 144, 255, 0.9); /* increased glow on hover */
+  box-shadow: 0 0 25px rgba(30, 144, 255, 0.9);
 }
-
 
 /* CAD Design Button: Always glow purple, intensified on hover */
 .cad-btn {
@@ -128,7 +126,7 @@ a:hover {
   margin-bottom: 2rem;
 }
 
-/* Info Cards Above Robots Section */
+/* Info Cards Section */
 .info-cards {
   display: flex;
   justify-content: space-between;
@@ -174,12 +172,19 @@ a:hover {
   padding: 60px 0;
 }
 
+.robot-video-grid {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
 .robot-video {
+  flex: 1 1 calc((100% - 40px) / 3);
   margin-bottom: 20px;
   overflow: hidden;
   border-radius: 15px;
 }
-
 .robot-video video {
   width: 100%;
   height: 800px;
@@ -188,7 +193,6 @@ a:hover {
   display: block;
   transition: box-shadow 0.3s;
 }
-
 .robot-video:hover video {
   box-shadow: 0 0 15px rgba(30, 144, 255, 0.5);
 }
@@ -201,12 +205,11 @@ a:hover {
 }
 
 .robot-tile {
-  background: rgba(30, 30, 30, 0);
+  background: transparent;
   border-radius: 15px;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
 }
-
 .robot-tile img {
   width: 100%;
   height: 100%;
@@ -214,23 +217,59 @@ a:hover {
   display: block;
   border-radius: 15px;
 }
-
 .robot-tile:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(30, 144, 255, 0.7);
 }
 
-/* Sandbox Section */
+/* Revised Sandbox Section */
 #sandbox {
+  position: relative;
+  max-width: 1200px;
+  margin: 40px auto;
+  background: linear-gradient(135deg, rgba(26,26,26,0.7), rgba(51,51,51,0.7));
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
   padding: 60px 0;
   max-width: 1100px;
   margin: 0 auto;
 }
-
+#sandbox h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #fff;
+  margin-bottom: 20px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
 .sandbox-description {
   text-align: center;
-  font-size: 1.1rem;
+  color: #ccc;
+  font-size: 1.2rem;
   margin-bottom: 20px;
+}
+
+/* Sandbox canvas container for finish line overlay */
+.sandbox-canvas-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+/* Checkered Finish Line */
+.finish-line {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 100%;
+  background-image: 
+    linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black),
+    linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
 
 #controls {
@@ -282,7 +321,6 @@ a:hover {
   transition: transform 0.3s, box-shadow 0.3s;
   box-shadow: 0 4px 10px rgba(255, 99, 71, 0.4);
 }
-
 #restart::after {
   content: "\f061";
   font-family: "Font Awesome 6 Free";
@@ -290,7 +328,6 @@ a:hover {
   color: #fff;
   font-size: 1.2rem;
 }
-
 #restart:hover {
   transform: scale(1.1);
   box-shadow: 0 6px 15px rgba(255, 99, 71, 0.6);
@@ -309,7 +346,6 @@ a:hover {
   padding: 5px;
   transition: transform 0.3s;
 }
-
 #speed-slider:hover {
   transform: scale(1.05);
 }
@@ -343,11 +379,9 @@ a:hover {
   min-height: 250px;
   transition: transform 0.3s;
 }
-
 .chart-container:hover {
   transform: translateY(-5px);
 }
-
 .chart-container canvas {
   width: 100% !important;
   height: 250px !important;
@@ -371,7 +405,6 @@ a:hover {
   text-align: center;
   transition: transform 0.3s, box-shadow 0.3s;
 }
-
 .team-member:hover {
   transform: scale(1.05);
   box-shadow: 0 0 10px rgba(30, 144, 255, 0.7);
@@ -385,7 +418,6 @@ a:hover {
   margin-bottom: 15px;
 }
 
-
 .team-member h3 {
   margin: 10px 0;
 }
@@ -395,7 +427,6 @@ a:hover {
   font-size: 1.5rem;
   transition: transform 0.3s;
 }
-
 .social-icons a:hover {
   transform: scale(1.2);
 }
@@ -437,7 +468,13 @@ footer {
   z-index: 3;
 }
 
-/* Remove old ground, trees, clouds styles */
+/* Hide unused legacy elements */
 .ground, .ground-tree1, .ground-tree2, .ground-cloud1, .ground-cloud2, .ground-cloud3, #clouds-canvas, #birds-canvas {
   display: none;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

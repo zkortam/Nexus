@@ -25,7 +25,6 @@ class Particle {
     this.x = Math.random() * starsCanvas.width;
     this.y = Math.random() * starsCanvas.height;
   }
-
   reset() {
     this.size = Math.random() * 2 + 1;
     this.speedX = (Math.random() - 0.5) * 0.5;
@@ -34,11 +33,9 @@ class Particle {
     this.pulseSpeed = Math.random() * 0.02 + 0.01;
     this.pulseOffset = Math.random() * Math.PI * 2;
   }
-
   update() {
     // Pulsing effect
     this.brightness = 0.5 + Math.sin(Date.now() * this.pulseSpeed + this.pulseOffset) * 0.2;
-    
     // Mouse interaction with increased sensitivity
     if (mouse.x && mouse.y) {
       let dx = mouse.x - this.x;
@@ -50,17 +47,14 @@ class Particle {
         this.y -= dy * force * 0.1;
       }
     }
-
     this.x += this.speedX;
     this.y += this.speedY;
-
     // Wrap around screen edges
     if (this.x < 0) this.x = starsCanvas.width;
     if (this.x > starsCanvas.width) this.x = 0;
     if (this.y < 0) this.y = starsCanvas.height;
     if (this.y > starsCanvas.height) this.y = 0;
   }
-
   draw() {
     ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
     ctx.beginPath();
@@ -73,7 +67,6 @@ class ShootingStar {
   constructor() {
     this.reset();
   }
-
   reset() {
     this.x = Math.random() * starsCanvas.width;
     this.y = 0;
@@ -86,7 +79,6 @@ class ShootingStar {
     this.trail = [];
     this.color = Math.random() < 0.3 ? '#63b3ed' : '#ffffff';
   }
-
   update() {
     if (!this.active) {
       if (Math.random() < 0.005) {
@@ -95,10 +87,8 @@ class ShootingStar {
       }
       return;
     }
-
     this.x += Math.cos(this.angle) * this.speed;
     this.y += Math.sin(this.angle) * this.speed;
-
     // Update trail with sparkle effect
     this.trail.unshift({ 
       x: this.x, 
@@ -106,9 +96,7 @@ class ShootingStar {
       opacity: this.opacity,
       sparkle: Math.random() > 0.7
     });
-    
     if (this.trail.length > 20) this.trail.pop();
-
     // Fade out when off screen
     if (this.x > starsCanvas.width || this.y > starsCanvas.height) {
       this.opacity -= this.fadeSpeed;
@@ -117,7 +105,6 @@ class ShootingStar {
       }
     }
   }
-
   draw() {
     if (!this.active) return;
     this.trail.forEach((point, index) => {
@@ -145,7 +132,6 @@ class BurningAsteroid {
     this.reset();
     this.active = true; // Always active from the beginning
   }
-
   reset() {
     this.x = Math.random() * starsCanvas.width;
     this.y = -50;
@@ -153,7 +139,6 @@ class BurningAsteroid {
     this.speed = Math.random() * 2 + 1;
     this.particles = [];
   }
-
   update() {
     this.y += this.speed;
     this.size *= 0.995; // Gradually shrink
@@ -179,7 +164,6 @@ class BurningAsteroid {
       this.reset();
     }
   }
-
   draw() {
     ctx.fillStyle = '#808080';
     ctx.beginPath();
@@ -453,7 +437,6 @@ function initFooterScene() {
     tree.position.set(x, 0, z);
     return tree;
   }
-
   function createForest() {
     // Remove only existing tree groups so that ground and other objects remain intact.
     scene.children = scene.children.filter(child => !(child.type === "Group" && child.name === "tree"));
@@ -485,7 +468,6 @@ function initFooterScene() {
     }
   }
   createForest();
-
   // Enhanced Clouds
   const clouds = [];
   class Cloud {
@@ -518,7 +500,6 @@ function initFooterScene() {
   for (let i = 0; i < 10; i++) {
     clouds.push(new Cloud());
   }
-
   // Enhanced Moon with Glow
   const moonGeometry = new THREE.SphereGeometry(5, 32, 32);
   const moonMaterial = new THREE.MeshStandardMaterial({ color: 0xD3D3D3, roughness: 0.7, emissive: 0x333333 });
@@ -528,7 +509,6 @@ function initFooterScene() {
   const moonGlow = new THREE.PointLight(0xaaaaaa, 0.5, 50);
   moonGlow.position.copy(moon.position);
   scene.add(moonGlow);
-
   // Enhanced Satellite
   const satelliteBody = new THREE.BoxGeometry(2, 1, 4);
   const satelliteMaterial = new THREE.MeshStandardMaterial({ color: 0x808080 });
@@ -549,10 +529,8 @@ function initFooterScene() {
   satelliteGroup.add(satellite, panelLeft, panelRight, antenna);
   satelliteGroup.position.set(-window.innerWidth / 2, 100, 0);
   scene.add(satelliteGroup);
-
   camera.position.set(0, 30, 50);
   camera.lookAt(0, 0, 0);
-
   function animateFooter() {
     requestAnimationFrame(animateFooter);
     clouds.forEach(cloud => cloud.update());
@@ -564,14 +542,12 @@ function initFooterScene() {
     renderer.render(scene, camera);
   }
   animateFooter();
-
   window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, 350);
     camera.aspect = window.innerWidth / 350;
     camera.updateProjectionMatrix();
     satelliteGroup.position.x = -window.innerWidth / 2;
   });
-
   console.log("Enhanced Three.js scene setup complete");
 }
 
@@ -588,14 +564,12 @@ if (aircraftCanvas) {
 } else {
   console.error("Aircraft canvas not found!");
 }
-
 let aircraft = {
   x: -100,
   y: 50,
   speed: 2,
   chemTrail: []
 };
-
 function updateAircraft() {
   aircraft.x += aircraft.speed;
   if (aircraft.x > aircraftCanvas.width + 100) {
@@ -613,17 +587,11 @@ function updateAircraft() {
     return { ...p, opacity: Math.max(1 - age, 0) };
   }).filter(p => p.opacity > 0);
 }
-
-// Load your airplane image once
 const planeImg = new Image();
 planeImg.src = 'assets/airplane.png';
-
-// Replace your "drawAircraft()" code with something like:
 function drawAircraft() {
   if (!aCtx) return;
   aCtx.clearRect(0, 0, aircraftCanvas.width, aircraftCanvas.height);
-
-  // Draw chemtrail dots, same as before
   aircraft.chemTrail.forEach(p => {
     aCtx.save();
     aCtx.globalAlpha = p.opacity;
@@ -633,11 +601,7 @@ function drawAircraft() {
     aCtx.fill();
     aCtx.restore();
   });
-
-  // Draw the airplane image
-  // planeImg.width and planeImg.height are valid only after the image is loaded
-  // Provide offsets so the plane’s center roughly matches (aircraft.x, aircraft.y)
-  let planeWidth = 60;   // a bit smaller or bigger based on your actual image
+  let planeWidth = 60;
   let planeHeight = 40;
   aCtx.drawImage(
     planeImg,
@@ -647,8 +611,6 @@ function drawAircraft() {
     planeHeight
   );
 }
-
-
 function animateAircraft() {
   if (aCtx) {
     updateAircraft();
@@ -656,7 +618,6 @@ function animateAircraft() {
     requestAnimationFrame(animateAircraft);
   }
 }
-
 if (aircraftCanvas) {
   animateAircraft();
 }
@@ -666,7 +627,6 @@ if (aircraftCanvas) {
  ************************************/
 let confettiParticles = [];
 let confettiInitialized = false;
-
 function initConfetti() {
   confettiParticles = [];
   for (let i = 0; i < 100; i++) {
@@ -683,7 +643,6 @@ function initConfetti() {
   }
   confettiInitialized = true;
 }
-
 function updateConfetti() {
   for (let p of confettiParticles) {
     p.speedY += p.gravity;
@@ -693,7 +652,6 @@ function updateConfetti() {
   }
   confettiParticles = confettiParticles.filter(p => p.opacity > 0);
 }
-
 function drawConfetti() {
   confettiParticles.forEach(p => {
     sCtx.save();
@@ -705,7 +663,6 @@ function drawConfetti() {
     sCtx.restore();
   });
 }
-
 function drawCelebration() {
   sCtx.save();
   sCtx.font = "bold 48px Arial";
@@ -730,8 +687,11 @@ if (sandboxCanvas) {
 } else {
   console.error("Sandbox canvas not found!");
 }
-
 const speedSlider = document.getElementById('speed-slider');
+// Allow speed slider up to 20x.
+if (speedSlider) {
+  speedSlider.max = "20";
+}
 const baseSpeed = 3;
 const cellSize = 20;
 const gridCols = Math.floor(sandboxCanvas ? sandboxCanvas.width / cellSize : 0);
@@ -748,7 +708,6 @@ function initOccupancyGrid() {
   }
 }
 if (sandboxCanvas) initOccupancyGrid();
-
 let mappingChart, obstacleChart, learningChart;
 
 /****************************
@@ -757,32 +716,59 @@ let mappingChart, obstacleChart, learningChart;
 function scanEnvironment() {
   const scanRadius = 50;
   let freeDots = [];
+  let encounteredDots = [];
   for (let i = 0; i < gridRows; i++) {
     for (let j = 0; j < gridCols; j++) {
+      // Only scan cells that haven't been scanned yet
       if (occupancyGrid[i][j] === 0) {
         let cellCenterX = j * cellSize + cellSize / 2;
         let cellCenterY = i * cellSize + cellSize / 2;
         let dx = cellCenterX - robot.x;
         let dy = cellCenterY - robot.y;
-        let d = Math.sqrt(dx * dx + dy * dy);
-        if (d < scanRadius) {
-          let occupied = false;
+        let dCell = Math.sqrt(dx * dx + dy * dy);
+        if (dCell < scanRadius) {
+          // Use same condition as green (if distance from cell center to any obstacle is < 40)
+          let encountered = false;
           for (let o of obstacles) {
-            if (pointInObstacle(cellCenterX, cellCenterY, o)) {
-              occupied = true;
+            let d;
+            if (o.shape === "rect" || o.shape === "square") {
+              d = pointRectDistance(cellCenterX, cellCenterY, o);
+            } else if (o.shape === "circle") {
+              d = pointCircleDistance(cellCenterX, cellCenterY, o);
+            } else {
+              d = pointPolygonDistance(cellCenterX, cellCenterY, o);
+            }
+            if (d < 40) {
+              encountered = true;
               break;
             }
           }
-          occupancyGrid[i][j] = occupied ? 1 : 2;
-          if (!occupied) {
+          occupancyGrid[i][j] = encountered ? 1 : 2;
+          if (encountered) {
+            encounteredDots.push({ x: cellCenterX, y: cellCenterY });
+          } else {
             freeDots.push({ x: cellCenterX, y: cellCenterY });
           }
         }
       }
     }
   }
-  if (freeDots.length > 0 && mappingChart && mappingChart.data) {
-    mappingChart.data.datasets[1].data.push(...freeDots);
+  if (mappingChart && mappingChart.data) {
+    if (encounteredDots.length > 0) {
+      mappingChart.data.datasets[0].data.push(...encounteredDots);
+    }
+    if (freeDots.length > 0) {
+      mappingChart.data.datasets[1].data.push(...freeDots);
+    }
+    let totalCells = gridRows * gridCols;
+    let scanned = 0;
+    for (let i = 0; i < gridRows; i++) {
+      for (let j = 0; j < gridCols; j++) {
+        if (occupancyGrid[i][j] !== 0) scanned++;
+      }
+    }
+    let progress = ((scanned / totalCells) * 100).toFixed(2);
+    mappingChart.options.plugins.title.text = "Mapping Progress: " + progress + "%";
     mappingChart.update();
   }
 }
@@ -833,14 +819,12 @@ function circleRectCollision(cx, cy, r, rect) {
   let dy = distY - rect.h / 2;
   return (dx * dx + dy * dy <= (r * r));
 }
-
 function circleCircleCollision(cx1, cy1, r1, cx2, cy2, r2) {
   let dx = cx1 - cx2;
   let dy = cy1 - cy2;
   let distance = Math.sqrt(dx * dx + dy * dy);
   return distance < (r1 + r2);
 }
-
 function pointInTriangle(px, py, tri) {
   const [x1, y1] = tri.points[0];
   const [x2, y2] = tri.points[1];
@@ -850,7 +834,6 @@ function pointInTriangle(px, py, tri) {
   const t = 1 / (2 * area) * (x1 * y2 - y1 * x2 + (y1 - y2) * px + (x2 - x1) * py);
   return s > 0 && t > 0 && (1 - s - t) > 0;
 }
-
 function pointInHexagon(px, py, hex) {
   let inside = false;
   for (let i = 0, j = 5; i < 6; i++) {
@@ -863,7 +846,6 @@ function pointInHexagon(px, py, hex) {
   }
   return inside;
 }
-
 function pointInTrapezoid(px, py, trap) {
   const [x1, y1] = trap.points[0];
   const [x2, y2] = trap.points[1];
@@ -874,7 +856,6 @@ function pointInTrapezoid(px, py, trap) {
   const t = 1 / (2 * area) * ((y2 * x3 - x2 * y3) + (y3 - y2) * px + (x2 - x3) * py);
   return s > 0 && t > 0 && (s + t) < 1;
 }
-
 function willCollide(x, y) {
   for (let o of obstacles) {
     if (o.shape === "rect" && circleRectCollision(x, y, robot.size, o)) return true;
@@ -886,19 +867,16 @@ function willCollide(x, y) {
   }
   return false;
 }
-
 function pointRectDistance(px, py, rect) {
   let dx = Math.max(rect.x - px, 0, px - (rect.x + rect.w));
   let dy = Math.max(rect.y - py, 0, py - (rect.y + rect.h));
   return Math.sqrt(dx * dx + dy * dy);
 }
-
 function pointCircleDistance(px, py, circle) {
   let dx = px - circle.cx;
   let dy = py - circle.cy;
   return Math.sqrt(dx * dx + dy * dy) - circle.r;
 }
-
 function pointPolygonDistance(px, py, poly) {
   let minDist = Infinity;
   for (let i = 0; i < poly.points.length; i++) {
@@ -914,22 +892,41 @@ function pointPolygonDistance(px, py, poly) {
   }
   return minDist;
 }
-
-function pointInObstacle(px, py, o) {
-  if (o.shape === "rect") {
-    return px > o.x && px < o.x + o.w && py > o.y && py < o.y + o.h;
-  } else if (o.shape === "circle") {
-    return Math.sqrt((px - o.cx) ** 2 + (py - o.cy) ** 2) < o.r;
-  } else if (o.shape === "triangle") {
-    return pointInTriangle(px, py, o);
-  } else if (o.shape === "hexagon") {
-    return pointInHexagon(px, py, o);
-  } else if (o.shape === "square") {
-    return px > o.x && px < o.x + o.w && py > o.y && py < o.y + o.w;
-  } else if (o.shape === "trapezoid") {
-    return pointInTrapezoid(px, py, o);
+/********************************
+ * New: Mapping-Based Obstacle Avoidance *
+ ********************************/
+// Compute a repulsion angle based on encountered (orange) cells in occupancyGrid.
+function getMappingAvoidanceVector() {
+  let repulseX = 0, repulseY = 0;
+  let count = 0;
+  for (let i = 0; i < gridRows; i++) {
+    for (let j = 0; j < gridCols; j++) {
+      if (occupancyGrid[i][j] === 1) { // encountered cell
+        let cellCenterX = j * cellSize + cellSize / 2;
+        let cellCenterY = i * cellSize + cellSize / 2;
+        let dx = cellCenterX - robot.x;
+        let dy = cellCenterY - robot.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < 80) { // threshold for avoidance from mapped obstacles
+          repulseX -= (dx / distance);
+          repulseY -= (dy / distance);
+          count++;
+        }
+      }
+    }
   }
-  return false;
+  if (count > 0) {
+    repulseX /= count;
+    repulseY /= count;
+    return Math.atan2(repulseY, repulseX);
+  }
+  return null;
+}
+// Helper: average two angles properly.
+function averageAngles(a, b) {
+  let x = Math.cos(a) + Math.cos(b);
+  let y = Math.sin(a) + Math.sin(b);
+  return Math.atan2(y, x);
 }
 
 /*****************************
@@ -959,7 +956,6 @@ function avoidObstacle() {
   }
   return null;
 }
-
 function simulateDistance(candidateAngle) {
   let simulatedX = robot.x;
   let simulatedY = robot.y;
@@ -972,7 +968,6 @@ function simulateDistance(candidateAngle) {
   }
   return total;
 }
-
 function findSafeDirection(currentAngle) {
   let bestAngle = currentAngle;
   let bestDistance = 0;
@@ -1025,9 +1020,7 @@ function initObstacles(mode) {
     ];
   }
 }
-
 if (sandboxCanvas) initObstacles("medium");
-
 function drawFinishLine() {
   sCtx.strokeStyle = "#FFFFFF";
   sCtx.lineWidth = 5;
@@ -1052,7 +1045,6 @@ function drawRobot() {
     sCtx.restore();
   }
 }
-
 let lastProximityCount = 0;
 function drawObstacles() {
   let proximityCount = 0;
@@ -1097,18 +1089,16 @@ function drawObstacles() {
  **********************************/
 function drawRobotIntellect() {
   if (!sCtx) return;
+  // First, try to avoid obstacles using direct sensor readings.
   let avoidanceDir = avoidObstacle();
   if (avoidanceDir !== null) {
     let safeDir = findSafeDirection(avoidanceDir);
-    sCtx.save();
-    sCtx.strokeStyle = "#ffffff";
-    sCtx.setLineDash([5, 5]);
-    sCtx.lineWidth = 2;
-    sCtx.beginPath();
-    sCtx.moveTo(robot.x, robot.y);
-    sCtx.lineTo(robot.x + Math.cos(safeDir) * 50, robot.y + Math.sin(safeDir) * 50);
-    sCtx.stroke();
-    sCtx.restore();
+    robot.direction = safeDir;
+  }
+  // Now incorporate mapping-based avoidance: if the map indicates an encountered dot nearby, steer away.
+  let mappingAvoidance = getMappingAvoidanceVector();
+  if (mappingAvoidance !== null) {
+    robot.direction = averageAngles(robot.direction, mappingAvoidance);
   }
   sCtx.save();
   sCtx.strokeStyle = "rgba(255,255,255,0.3)";
@@ -1131,18 +1121,14 @@ let collisionCount = 0;
 let turnCount = 0;
 let simulationTime = 0;
 let scanCounter = 0;
-
 function updateRobot() {
   if (finished || !sCtx) return;
-  
   let speedMultiplier = speedSlider ? Number(speedSlider.value) : 1;
   robot.speed = baseSpeed * speedMultiplier;
-  
   scanCounter++;
   if (scanCounter % 20 === 0) {
     scanEnvironment();
   }
-  
   if (explorationPhase) {
     let frontier = findFrontier();
     if (frontier) {
@@ -1151,16 +1137,14 @@ function updateRobot() {
       explorationPhase = false;
     }
   }
-  
   let avoidanceDir = avoidObstacle();
   if (avoidanceDir !== null) {
     let safeDir = findSafeDirection(avoidanceDir);
     robot.direction = safeDir;
   }
-  
+  // Mapping-based avoidance is applied in drawRobotIntellect
   let proposedX = robot.x + Math.cos(robot.direction) * robot.speed;
   let proposedY = robot.y + Math.sin(robot.direction) * robot.speed;
-  
   if (proposedX < robot.size) {
     proposedX = robot.size;
     robot.direction = Math.PI - robot.direction;
@@ -1181,7 +1165,6 @@ function updateRobot() {
     robot.direction = -robot.direction;
     turnCount++;
   }
-  
   let attempts = 0;
   while (attempts < 5 && willCollide(proposedX, proposedY)) {
     for (let o of obstacles) {
@@ -1203,7 +1186,6 @@ function updateRobot() {
     proposedY = robot.y + Math.sin(robot.direction) * robot.speed;
     attempts++;
   }
-  
   if (willCollide(proposedX, proposedY)) {
     collisionCount++;
     let kickDir = Math.random() * Math.PI * 2;
@@ -1218,12 +1200,10 @@ function updateRobot() {
     robot.x = proposedX;
     robot.y = proposedY;
   }
-  
   if (robot.x + robot.size >= sandboxCanvas.width - 10) {
     finished = true;
   }
 }
-
 function animateSandbox() {
   if (sCtx) {
     sCtx.clearRect(0, 0, sandboxCanvas.width, sandboxCanvas.height);
@@ -1232,7 +1212,6 @@ function animateSandbox() {
     drawObstacles();
     drawRobotIntellect();
     drawFinishLine();
-    
     if (finished) {
       if (!confettiInitialized) {
         initConfetti();
@@ -1246,7 +1225,6 @@ function animateSandbox() {
     console.error("Sandbox context not available for animation!");
   }
 }
-
 if (sandboxCanvas && sCtx) {
   animateSandbox();
 }
@@ -1258,22 +1236,20 @@ function createCharts() {
   const chart1 = document.getElementById('chart1');
   const chart2 = document.getElementById('chart2');
   const chart3 = document.getElementById('chart3');
-  
   if (!chart1 || !chart2 || !chart3) {
     console.error("One or more chart canvases not found!");
     return;
   }
-
   const mappingCtx = chart1.getContext('2d');
   const obstacleCtx = chart2.getContext('2d');
   const learningCtx = chart3.getContext('2d');
-  
+  // Dataset 0: encountered objects (orange); Dataset 1: free areas (blue)
   mappingChart = new Chart(mappingCtx, {
     type: 'scatter',
     data: {
       datasets: [
         {
-          label: 'Collision Points',
+          label: 'Encountered Objects',
           data: [],
           backgroundColor: '#FF4500',
           pointRadius: 5
@@ -1299,7 +1275,6 @@ function createCharts() {
       }
     }
   });
-  
   obstacleChart = new Chart(obstacleCtx, {
     type: 'line',
     data: {
@@ -1320,13 +1295,12 @@ function createCharts() {
       plugins: { legend: { position: 'bottom' } }
     }
   });
-  
   learningChart = new Chart(learningCtx, {
     type: 'line',
     data: {
       labels: [],
       datasets: [{
-        label: 'Learning Curve',
+        label: 'Mapping Efficiency (Scanned Cells / Distance)',
         data: [],
         borderColor: '#63b3ed',
         backgroundColor: 'rgba(99,179,237,0.2)',
@@ -1341,13 +1315,38 @@ function createCharts() {
     }
   });
 }
-
+// Returns the number of scanned cells in the occupancy grid.
+function getScannedCells() {
+  let count = 0;
+  for (let i = 0; i < gridRows; i++) {
+    for (let j = 0; j < gridCols; j++) {
+      if (occupancyGrid[i][j] !== 0) count++;
+    }
+  }
+  return count;
+}
+// Update dynamic charts 10× faster (every 100ms). simulationTime increases by 0.1 per update.
+// The learning chart now tracks mapping efficiency = scannedCells / cumulativeDistance.
+function updateDynamicCharts() {
+  simulationTime += 0.1;
+  if (obstacleChart) {
+    obstacleChart.data.labels.push(simulationTime.toFixed(1));
+    obstacleChart.data.datasets[0].data.push(collisionCount);
+    obstacleChart.update();
+  }
+  if (learningChart) {
+    let scanned = getScannedCells();
+    let efficiency = cumulativeDistance > 0 ? scanned / cumulativeDistance : 0;
+    learningChart.data.labels.push(simulationTime.toFixed(1));
+    learningChart.data.datasets[0].data.push(efficiency);
+    learningChart.update();
+  }
+}
 window.addEventListener('load', () => {
   // Get the buttons by their class names
   const exploreBtn = document.querySelector('.explore-btn');
   const githubBtn = document.querySelector('.github-btn');
   const cadBtn = document.querySelector('.cad-btn');
-
   // When "Explore" is clicked, scroll to the video section
   if (exploreBtn) {
     exploreBtn.addEventListener('click', () => {
@@ -1357,23 +1356,24 @@ window.addEventListener('load', () => {
       }
     });
   }
-
   // When "GitHub" is clicked, navigate to your GitHub repo
   if (githubBtn) {
     githubBtn.addEventListener('click', () => {
       window.location.href = "https://github.com/zkortam/Nexus";
     });
   }
-
   // When "CAD" is clicked, navigate to your Onshape CAD document
   if (cadBtn) {
     cadBtn.addEventListener('click', () => {
       window.location.href = "https://cad.onshape.com/documents/c5fff8378d1fea5a3b263ec9/w/bb9f2df86fea4bee1c8a8af8/e/027c2a1c29cde35068e23da3";
     });
   }
+  // Initialize charts and Three.js footer scene
+  createCharts();
+  initFooterScene();
+  // Start updating the dynamic charts every 100ms
+  setInterval(updateDynamicCharts, 100);
 });
-
-
 /***********************
  * Restart & Controls *
  ***********************/
@@ -1381,11 +1381,10 @@ if (restartBtn) {
   restartBtn.addEventListener("click", () => {
     explorationPhase = true;
     finished = false;
-    initOccupancyGrid();
+    // Do not reset mapping progress unless switching modes
     resetSimulation();
   });
 }
-
 // Reset simulation and charts on mode switch
 diffSelect.addEventListener('change', () => {
   resetSimulation();
@@ -1405,7 +1404,6 @@ diffSelect.addEventListener('change', () => {
     learningChart.update();
   }
 });
-
 function resetSimulation() {
   cumulativeDistance = 0;
   collisionCount = 0;
@@ -1413,13 +1411,14 @@ function resetSimulation() {
   simulationTime = 0;
   scanCounter = 0;
   lastProximityCount = 0;
+  // Only reset occupancy grid on mode change (or restart)
+  // When using arrow keys, mapping progress persists.
   robot = { x: 50, y: sandboxCanvas ? sandboxCanvas.height / 2 : 200, size: 20, speed: baseSpeed, direction: Math.random() * Math.PI * 2, inCollision: false };
   let mode = diffSelect ? diffSelect.value : "medium";
   initObstacles(mode);
-  // Also reset occupancy grid
+  // Also reset occupancy grid only on simulation reset
   initOccupancyGrid();
 }
-  
 // Scroll event for atmospheric effects in sandbox
 window.addEventListener('scroll', () => {
   const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
@@ -1439,8 +1438,4 @@ window.addEventListener('scroll', () => {
       el.classList.remove('heat-ripple');
     });
   }
-});
-
-window.addEventListener('load', () => {
-  initFooterScene();
 });

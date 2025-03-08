@@ -61,7 +61,16 @@ a:hover {
 }
 
 /* Explore Button remains unchanged */
-.explore-btn {}
+.explore-btn {
+  box-shadow: 0 0 15px rgba(30, 144, 255, 0.6); /* default glow */
+  transition: box-shadow 0.3s ease;
+  margin-left: 5px;
+}
+
+.explore-btn:hover {
+  box-shadow: 0 0 25px rgba(30, 144, 255, 0.9); /* increased glow on hover */
+}
+
 
 /* CAD Design Button: Always glow purple, intensified on hover */
 .cad-btn {
@@ -371,9 +380,11 @@ a:hover {
 .team-member img {
   width: 100px;
   height: 100px;
+  object-fit: cover;
   border-radius: 50%;
   margin-bottom: 15px;
 }
+
 
 .team-member h3 {
   margin: 10px 0;

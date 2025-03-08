@@ -614,9 +614,16 @@ function updateAircraft() {
   }).filter(p => p.opacity > 0);
 }
 
+// Load your airplane image once
+const planeImg = new Image();
+planeImg.src = 'assets/airplane.png';
+
+// Replace your "drawAircraft()" code with something like:
 function drawAircraft() {
   if (!aCtx) return;
   aCtx.clearRect(0, 0, aircraftCanvas.width, aircraftCanvas.height);
+
+  // Draw chemtrail dots, same as before
   aircraft.chemTrail.forEach(p => {
     aCtx.save();
     aCtx.globalAlpha = p.opacity;
@@ -626,16 +633,21 @@ function drawAircraft() {
     aCtx.fill();
     aCtx.restore();
   });
-  aCtx.save();
-  aCtx.fillStyle = "#ffcc00";
-  aCtx.beginPath();
-  aCtx.moveTo(aircraft.x, aircraft.y);
-  aCtx.lineTo(aircraft.x - 30, aircraft.y - 10);
-  aCtx.lineTo(aircraft.x - 30, aircraft.y + 10);
-  aCtx.closePath();
-  aCtx.fill();
-  aCtx.restore();
+
+  // Draw the airplane image
+  // planeImg.width and planeImg.height are valid only after the image is loaded
+  // Provide offsets so the plane’s center roughly matches (aircraft.x, aircraft.y)
+  let planeWidth = 60;   // a bit smaller or bigger based on your actual image
+  let planeHeight = 40;
+  aCtx.drawImage(
+    planeImg,
+    aircraft.x - planeWidth / 2,
+    aircraft.y - planeHeight / 2,
+    planeWidth,
+    planeHeight
+  );
 }
+
 
 function animateAircraft() {
   if (aCtx) {

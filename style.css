@@ -232,6 +232,30 @@ a:hover {
   box-shadow: 0 0 15px rgba(30, 144, 255, 0.7);
 }
 
+/* Poster Container */
+.poster-container {
+  margin-top: 20px; /* Space between grid and poster */
+  width: 100%; /* Matches the full width of the robot-grid */
+  max-width: 1200px; /* Consistent with .container max-width */
+  display: flex;
+  justify-content: center; /* Center the image if it doesn't span full width */
+}
+
+/* Poster Image */
+.poster-image {
+  width: 100%; /* Span the full width of the container (3 tiles) */
+  aspect-ratio: 16 / 9; /* Enforce 16:9 aspect ratio */
+  object-fit: cover; /* Ensure the image fills the space without distortion */
+  border-radius: 15px; /* Consistent with other elements */
+  transition: transform 0.3s, box-shadow 0.3s; /* Smooth hover effects */
+  box-shadow: 0 4px 15px rgba(30, 144, 255, 0.4); /* Subtle glow */
+}
+
+.poster-image:hover {
+  transform: scale(1.02); /* Slight zoom on hover */
+  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.7); /* Enhanced glow on hover */
+}
+
 /* Revised Sandbox Section */
 #sandbox {
   position: relative;
@@ -504,6 +528,12 @@ footer {
   .robot-grid {
     grid-template-columns: 1fr;
   }
+  .poster-container {
+    margin-top: 15px;
+  }
+  .poster-image {
+    width: 100%; /* Full width on smaller screens */
+  }
   #sandbox {
     padding: 20px;
     margin: 20px auto;
@@ -545,5 +575,8 @@ footer {
   }
   #speedControl label {
     font-size: 1rem;
+  }
+  .poster-container {
+    margin-top: 10px;
   }
 }

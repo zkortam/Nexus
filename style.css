@@ -256,6 +256,107 @@ a:hover {
   box-shadow: 0 6px 20px rgba(30, 144, 255, 0.7); /* Enhanced glow on hover */
 }
 
+/* Competition Day Section */
+#competition-day {
+  padding: 60px 0;
+}
+
+#competition-day h2 {
+  text-align: center;
+  font-size: 3rem;
+  color: #fff;
+  margin-bottom: 40px;
+  text-shadow: 0 0 10px rgba(30, 144, 255, 0.7); /* Glow effect */
+}
+
+.competition-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.competition-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 15px;
+  padding: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.competition-tile:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(30, 144, 255, 0.7);
+}
+
+.competition-tile img {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
+
+.competition-tile p {
+  margin: 5px 0;
+  text-align: center;
+}
+
+.competition-tile p strong {
+  font-size: 1.2rem;
+}
+
+.vertical-videos {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.competition-video {
+  flex: 1 1 calc((100% - 40px) / 3);
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.competition-video video {
+  width: 100%;
+  aspect-ratio: 9 / 16; /* Enforce vertical aspect ratio */
+  object-fit: cover;
+  border-radius: 15px;
+  display: block;
+  transition: box-shadow 0.3s;
+}
+
+.competition-video:hover video {
+  box-shadow: 0 0 15px rgba(30, 144, 255, 0.5);
+}
+
+.improvements {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+}
+
+/* Team Image Styling */
+.team-image {
+  margin-top: 40px;
+}
+
+.team-image-img {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(30, 144, 255, 0.4);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.team-image-img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.7);
+}
+
 /* Revised Sandbox Section */
 #sandbox {
   position: relative;
@@ -549,6 +650,17 @@ footer {
   #speed-slider {
     width: 100%;
   }
+  .competition-grid {
+    grid-template-columns: 1fr;
+  }
+  .vertical-videos {
+    flex-direction: column;
+    align-items: center;
+  }
+  .competition-video {
+    width: 100%;
+    max-width: 300px;
+  }
 }
 
 /* For mobile phones */
@@ -579,4 +691,28 @@ footer {
   .poster-container {
     margin-top: 10px;
   }
+  #competition-day h2 {
+    font-size: 2.5rem;
+  }
+}
+
+.vertical-videos {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.competition-video {
+  flex: 1 1 calc((100% - 40px) / 3); /* Adjusts width for 3 videos */
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.competition-video video {
+  width: 100%;
+  aspect-ratio: 9 / 16; /* Keeps vertical video shape */
+  object-fit: cover;
+  border-radius: 15px;
+  display: block; /* Ensures video is visible */
 }
